@@ -3,8 +3,10 @@
 # Filter to correct the case of course fullnames for import to Canvas.
 # Input comes from one CSV file, and output is written to another.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-15
+# Infilename argument added, 2020-07-27
 
 import csv
+from pathlib import Path
 import re
 from typing import Dict, List
 
@@ -12,9 +14,9 @@ from typing import Dict, List
 # row of data in the CSV file.  For each row, the keys of the dict are
 # the CSV column titles, and the values are the corresponding data
 # values from the row.
-def read_from_csv(infilename:str) -> List[Dict[str, str]]:
+def read_from_csv(infile:Path) -> List[Dict[str, str]]:
     records:List[Dict[str, str]] = []
-    with open(infilename, newline='') as f:
+    with open(infile, newline='') as f:
         reader = csv.DictReader(f) # Turns each row into a dictionary
         for row in reader:
             records.append(row)
@@ -52,14 +54,12 @@ def correct_case(coursename:str) -> str:
         upperword:str = word.upper()
         lowerword:str = word.lower()
 
-        if lowerword in downcased_words:
-            wordlist[i] = lowerword
-        elif upperword in (upcased_words + upcased_words_colons):
+        if upperword in (upcased_words + upcased_words_colons):
             wordlist[i] = upperword
 
-        # Handle "The" specially, leaving it capitalized if it's first
-        elif word == 'The' and i > 2:
-            wordlist[i] = 'the'
+        # If a downcased word is first in the title, leave it capitalized
+        elif i > 2 and lowerword in downcased_words:
+            wordlist[i] = lowerword
 
         # "D/HH" is upcased regardless of context
         elif 'd/hh' in lowerword:
@@ -90,18 +90,22 @@ def filter_records(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
         outrecords.append(filter_one_course(record))
     return outrecords
 
-def write_outfile(records:List[Dict[str, str]], filename:str) -> None:
-    with open(filename, 'w', newline='') as f:
+def write_outfile(records:List[Dict[str, str]], outfile:Path) -> None:
+    with open(outfile, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=records[0].keys())
         writer.writeheader()
         for row in records:
             writer.writerow(row)
 
 def main(argv:List[str]) -> int:
-    inrecords:List[Dict[str, str]] = read_from_csv('courses.csv')
+    infile:Path = Path('courses.csv')
+    if len(argv) > 1:
+        infile = Path(argv[1])
+    inrecords:List[Dict[str, str]] = read_from_csv(infile)
     outrecords:List[Dict[str, str]] = filter_records(inrecords)
     #print(outrecords)
-    write_outfile(outrecords, 'courses-fixed.csv')
+    outfile:Path = infile.with_name(infile.stem + '-fixed.csv')
+    write_outfile(outrecords, outfile)
 
 if __name__ == '__main__':
     import sys
