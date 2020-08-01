@@ -9,7 +9,7 @@ from pathlib import Path
 import re
 from typing import Dict, List
 
-from fix_course_fullnames import read_from_csv, write_outfile
+from fix_course_fullnames import get_data_dirs, read_from_csv, write_outfile
 
 # Fix initials in the long name.  I am brazenly assuming that we have no
 # Harry S Trumans, and that every initial actually stands for something.
@@ -44,13 +44,13 @@ def filter_records(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
 
 
 def main(argv:List[str]) -> int:
-    infile:Path = Path('users.csv')
+    infile:Path = get_data_dirs()['inputdir'].joinpath('users.csv')
     if len(argv) > 1:
         infile = Path(argv[1])
     inrecords:List[Dict[str, str]] = read_from_csv(infile)
     outrecords:List[Dict[str, str]] = filter_records(inrecords)
     print(outrecords)
-    outfile:Path = infile.with_name(infile.stem + '-fixed.csv')
+    outfile:Path = get_data_dirs()['outputdir'].joinpath(infile.stem + '-fixed.csv')
     write_outfile(outrecords, outfile)
 
 if __name__ == '__main__':

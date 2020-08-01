@@ -4,11 +4,17 @@
 # Input comes from one CSV file, and output is written to another.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-15
 # Infilename argument added, 2020-07-27
+# get_data_dirs function added, 2020-07-31
 
 import csv
 from pathlib import Path
 import re
 from typing import Dict, List
+
+# Returns a dict of the infile and outfile directories
+def get_data_dirs() -> Dict[str, Path]:
+    return {'inputdir': Path('//speed-server/Canvas_Data'),
+            'outputdir': Path.home().joinpath('Desktop', 'canvas_scripts') }
 
 # Reads the CSV file into a list of dictionaries, one dictionary per
 # row of data in the CSV file.  For each row, the keys of the dict are
@@ -19,7 +25,15 @@ def read_from_csv(infile:Path) -> List[Dict[str, str]]:
     with open(infile, newline='') as f:
         reader = csv.DictReader(f) # Turns each row into a dictionary
         for row in reader:
-            records.append(row)
+            # Ensure strange characters don't creep into the keys
+            newrow = row.copy()
+            for key in row.keys():
+                # We're trying to delete a 3-character BOM
+                if not key[:3].isalpha():
+                    newkey:str = key[3:]
+                    newrow[newkey] = row[key]
+                    del newrow[key]
+            records.append(newrow)
     # Post: for all 0 <= i < j < len(records),
     #              records[i].keys() == records[j].keys()
     # The DictReader guarantees this is true, BTW.
@@ -98,13 +112,13 @@ def write_outfile(records:List[Dict[str, str]], outfile:Path) -> None:
             writer.writerow(row)
 
 def main(argv:List[str]) -> int:
-    infile:Path = Path('courses.csv')
+    infile:Path = get_data_dirs()['inputdir'].joinpath('Courses.csv')
     if len(argv) > 1:
         infile = Path(argv[1])
     inrecords:List[Dict[str, str]] = read_from_csv(infile)
     outrecords:List[Dict[str, str]] = filter_records(inrecords)
     #print(outrecords)
-    outfile:Path = infile.with_name(infile.stem + '-fixed.csv')
+    outfile:Path = get_data_dirs()['outputdir'].joinpath(infile.stem + '-fixed.csv')
     write_outfile(outrecords, outfile)
 
 if __name__ == '__main__':
