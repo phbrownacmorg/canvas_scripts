@@ -1,4 +1,4 @@
-#! /usr/bin/python3.7
+#! /usr/bin/python3.8
 
 # Filter to add training-course enrollments to enrollments.csv
 # Input comes from one CSV file, and output is written to another.
