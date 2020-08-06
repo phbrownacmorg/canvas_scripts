@@ -7,8 +7,8 @@
 from pathlib import Path
 import sys
 from typing import Dict, List
-from filter_csv import filter, stem_list
-from upload_csv import upload
+from filter_csv import filter_csv, stem_list
+from upload_csv import get_last_upload, write_last_upload, upload
 
 # ------------------- filtering ----------------------------------------
 
@@ -26,11 +26,15 @@ def get_data_dirs() -> Dict[str, Path]:
 
 def main(argv:List[str]) -> int:
     filters = stem_list()
-    last_upload = 0
-    for stem in ['users']: #filters.keys():
-        filter(stem, get_data_dirs(), filters[stem])
-        # Upload
-        last_upload = upload(stem, get_data_dirs()['outputdir'], last_upload)
+    datadirs = get_data_dirs()
+    last_upload = get_last_upload(datadirs['outputdir'])
+    
+    for stem in filters.keys():
+        print(stem)
+        filter_csv(stem, datadirs, filters[stem])
+        last_upload = upload(stem, datadirs['outputdir'], last_upload)
+        
+    write_last_upload(last_upload, datadirs['outputdir'])
     return 0
 
 if __name__ == '__main__':

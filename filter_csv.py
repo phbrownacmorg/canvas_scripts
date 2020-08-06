@@ -1,7 +1,6 @@
 #! /usr/bin/python3.8
 
-# Filter to correct the case of course fullnames for import to Canvas.
-# Input comes from one CSV file, and output is written to another.
+# Functions to filter Canvas CSV files prior to uplaoding them.
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04
 
 import csv
@@ -11,6 +10,7 @@ from typing import Callable, Dict, List
 from fix_users import filter_users
 from fix_courses import filter_courses
 
+# Almost-empty filter just returns a shallow copy of the input.
 def identity_filter(records:List[Dict[str, str]]) -> List[Dict[str, str]]:
     return records[:]
 
@@ -64,7 +64,10 @@ def write_outfile(records:List[Dict[str, str]], outfile:Path) -> None:
         for row in records:
             writer.writerow(row)
 
-def filter(stem:str, data_dirs:Dict[str, Path],
+# Takes a STEM, a pair of directories DATA_DIRS, and a filter function
+# STEM_FILTER.  Reads an input CSV file, filters the resulting records
+# using STEM_FILTER, and writes the result to an output CSV file.
+def filter_csv(stem:str, data_dirs:Dict[str, Path],
            stem_filter:Callable[[List[Dict[str, str]]], \
                                 List[Dict[str, str]]]) -> None:
     infile:Path = data_dirs['inputdir'].joinpath(stem + '.csv')

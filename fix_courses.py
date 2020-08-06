@@ -1,10 +1,10 @@
 #! /usr/bin/python3.8
 
 # Filter to correct the case of course fullnames for import to Canvas.
-# Input comes from one CSV file, and output is written to another.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-15
 # Infilename argument added, 2020-07-27
 # get_data_dirs function added, 2020-07-31
+# Changed from a standalone program to a library, 2020-08-04
 
 from typing import Dict, List
 
@@ -67,6 +67,8 @@ def filter_one_course(inrec:Dict[str, str]) -> Dict[str, str]:
                 outrec[key] = ''
     return outrec
 
+# Takes a list of course records, each one a dictionary, filters them,
+# and returns the result of that filtering.
 def filter_courses(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
     for record in inrecords:

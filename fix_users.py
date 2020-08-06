@@ -1,8 +1,8 @@
 #! /usr/bin/python3.8
 
 # Filter to correct the punctuation of users' fullnames for import to Canvas.
-# Input comes from one CSV file, and output is written to another.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-27
+# Changed from a standalone program to a library, 2020-08-04
 
 import re
 from typing import Dict, List
@@ -32,6 +32,8 @@ def filter_one_user(inrec:Dict[str, str]) -> Dict[str, str]:
                 outrec[key] = ''
     return outrec
 
+# Takes a list of user records, each one a dictionary, filters them,
+# and returns the result of that filtering.
 def filter_users(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
     for record in inrecords:
