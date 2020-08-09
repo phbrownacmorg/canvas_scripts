@@ -9,6 +9,7 @@ import sys
 from typing import Callable, Dict, List
 from fix_users import filter_users
 from fix_courses import filter_courses
+from fix_enrollments import filter_enrollments
 
 # Almost-empty filter just returns a shallow copy of the input.
 def identity_filter(records:List[Dict[str, str]]) -> List[Dict[str, str]]:
@@ -18,7 +19,7 @@ def identity_filter(records:List[Dict[str, str]]) -> List[Dict[str, str]]:
 def stem_list() -> Dict[str, Callable[[List[Dict[str, str]]],
                                       List[Dict[str, str]]]]:
     return {'users': filter_users, 'Courses' : filter_courses,
-            'Enrollments': identity_filter }
+            'Enrollments': filter_enrollments }
 
 # Reads a CSV file into a list of dictionaries, one dictionary per
 # row of data in the CSV file.  For each row, the keys of the dict are
