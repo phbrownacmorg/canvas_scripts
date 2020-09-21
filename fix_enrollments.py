@@ -8,9 +8,12 @@ from typing import Dict, List
 
 def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
+    course_shims:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
     students = set()
     teachers = set()
     for record in inrecords:
+        if record['course_id'] in course_shims.keys():
+            record['course_id'] = course_shims[record['course_id']]
         outrecords.append(record)
         if record['role'] == 'student':
             students.add(record['user_id'])

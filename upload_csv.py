@@ -61,11 +61,12 @@ def upload_complete(idnum:int) -> bool:
     complete = (idnum == -1)
     if not complete:
         token = get_access_token()
-        cmd = ['curl', '--silent', '--show-error',
+        cmd = ['curl', '--silent', '--show-error', 
                '-H', "Authorization: Bearer " + token,
                ('https://{0}/api/v1/accounts/self/sis_imports/' +
                 '{1}').format(constants()['host'], idnum)]
         output:str = bytesOrStrPrintable(subprocess.check_output(cmd))
+        #print(output)
         data = json.loads(output)
         if data['progress'] == 100 \
            and data['workflow_state'].startswith('imported'):
@@ -82,7 +83,7 @@ def upload_complete(idnum:int) -> bool:
 # Wait for the upload with id LAST_UPLOAD to complete, using a loop.
 # If the upload takes *too* long, raise an exception.
 def wait_for_upload_complete(last_upload:int) -> bool:
-    max_wait = 300 # Max time to wait (seconds)
+    max_wait = 1000 # Max time to wait (seconds)
     wait_step = 5  # Wait time each time around the loop (seconds)
     waited = 0     # Time waited so far (seconds)
     while waited < max_wait and not upload_complete(last_upload):
