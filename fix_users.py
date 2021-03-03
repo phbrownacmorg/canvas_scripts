@@ -1,4 +1,4 @@
-#! /usr/bin/python3.8
+#! /usr/bin/python3
 
 # Filter to correct the punctuation of users' fullnames for import to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-27
@@ -32,10 +32,20 @@ def filter_one_user(inrec:Dict[str, str]) -> Dict[str, str]:
                 outrec[key] = ''
     return outrec
 
+# Determine if a record is valid for input to Canvas.  Currently, this
+# filters out folks who have a login_id that isn't a Converse email
+# address.
+def valid_for_input(record:Dict[str, str]) -> bool:
+    result:bool = True
+    if not record['login_id'].endswith('@converse.edu'):
+        result = False
+    return result
+
 # Takes a list of user records, each one a dictionary, filters them,
 # and returns the result of that filtering.
 def filter_users(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
     for record in inrecords:
-        outrecords.append(filter_one_user(record))
+        if valid_for_input(record):
+            outrecords.append(filter_one_user(record))
     return outrecords

@@ -1,4 +1,4 @@
-#! /usr/bin/python3.8
+#! /usr/bin/python3
 
 # Functions for uploading CSV files to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04

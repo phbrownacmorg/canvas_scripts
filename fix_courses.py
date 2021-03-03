@@ -6,7 +6,7 @@
 # get_data_dirs function added, 2020-07-31
 # Changed from a standalone program to a library, 2020-08-04
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 # Make the case of coursename a little easier on the eyes than the
 # all-upper-case favored by the Registrar's Office.
@@ -50,6 +50,10 @@ def correct_case(coursename:str) -> str:
             
     return ' '.join(wordlist)
 
+goodterms:Tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
+                            '2021-JA', '2021-SP', '2021-AS',
+                            '2021-BS', '2021-2S', '2021-3S')
+
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
 def filter_one_course(inrec:Dict[str, str]) -> Dict[str, str]:
@@ -63,14 +67,23 @@ def filter_one_course(inrec:Dict[str, str]) -> Dict[str, str]:
                 outrec['long_name'] = correct_case(value)
             elif value not in values_to_ignore:
                 outrec[key] = value
+                #if key == 'status' and inrec['term_id'] not in goodterms:
+                #    outrec['status'] = 'deleted'
             else:
                 outrec[key] = ''
     return outrec
+
+# Determine whether the course represented by RECORD should be entered
+# in Canvas or not.
+def valid_course(record:Dict[str,str]) -> bool:
+    result:bool = (record['term_id'] in goodterms)
+    return result
 
 # Takes a list of course records, each one a dictionary, filters them,
 # and returns the result of that filtering.
 def filter_courses(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
     for record in inrecords:
-        outrecords.append(filter_one_course(record))
+        if valid_course(record):
+            outrecords.append(filter_one_course(record))
     return outrecords

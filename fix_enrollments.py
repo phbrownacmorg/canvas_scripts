@@ -1,20 +1,40 @@
-#! /usr/bin/python3.8
+#! /usr/bin/python3
 
 # Filter to add training-course enrollments to enrollments.csv
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
 import re
-from typing import Dict, List
+from typing import Dict, List, Set, Tuple
 
 def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
-    course_shims:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
-    students = set()
-    teachers = set()
+    course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+    course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+                                     "PSY281H.95-2021-JA": "PSY281.95-2021-JA" }
+    blacklist:Tuple[Tuple[str,str], ...] = (('1412633', 'EDU299H.01-2021-JA'),
+                                            ('1412633', 'ENG299H.01-2021-JA'),
+                                            ('1531377', 'CHM203L.02-2021-SP'),
+                                            ('1504003', 'CHM203L.02-2021-SP'),
+                                            ('1508775', 'CHM203L.01-2021-SP'),
+                                            ('1528718', 'CHM203L.01-2021-SP'),
+                                            ('1524907', 'CHM203L.01-2021-SP'),
+                                            ('1346473', 'ENG525.S1-2021-SP'))
+    students:Set(str) = set()
+    teachers:Set(str) = set()
     for record in inrecords:
-        if record['course_id'] in course_shims.keys():
-            record['course_id'] = course_shims[record['course_id']]
-        outrecords.append(record)
+        # Massage record itself
+        if record['course_id'] in course_subs.keys():
+            record['course_id'] = course_subs[record['course_id']]
+        elif record['course_id'] in course_doubles.keys():
+            newrecord = dict(record,
+                             course_id=course_doubles[record['course_id']])
+            inrecords.append(newrecord)
+
+        # Add the adjusted record to outrecords
+        if not (record['user_id'], record['course_id']) in blacklist:
+            outrecords.append(record)
+
+        # Keep track of students and teachers
         if record['role'] == 'student':
             students.add(record['user_id'])
         elif record['role'] == 'teacher':
