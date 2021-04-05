@@ -11,14 +11,16 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
     course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
                                      "PSY281H.95-2021-JA": "PSY281.95-2021-JA" }
-    blacklist:Tuple[Tuple[str,str], ...] = (('1412633', 'EDU299H.01-2021-JA'),
-                                            ('1412633', 'ENG299H.01-2021-JA'),
+    blacklist:Tuple[Tuple[str,str], ...] = (#('1412633', 'EDU299H.01-2021-JA'),
+                                            #('1412633', 'ENG299H.01-2021-JA'),
                                             ('1531377', 'CHM203L.02-2021-SP'),
                                             ('1504003', 'CHM203L.02-2021-SP'),
                                             ('1508775', 'CHM203L.01-2021-SP'),
                                             ('1528718', 'CHM203L.01-2021-SP'),
                                             ('1524907', 'CHM203L.01-2021-SP'),
-                                            ('1346473', 'ENG525.S1-2021-SP'))
+                                            ('1346473', 'ENG525.S1-2021-SP'),
+                                            ('1563361', 'EDU592.Y6-2021-SP'),
+                                            ('1564738', 'EDU592.Y1-2021-AS'))
     students:Set(str) = set()
     teachers:Set(str) = set()
     for record in inrecords:

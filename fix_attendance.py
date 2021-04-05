@@ -75,6 +75,7 @@ def main(argv:List[str]) -> int:
         newrecords.extend(read_from_csv(f))
         oldrecords = merge_attendances(oldrecords, newrecords)
     #print(oldrecords)
+    destfile.replace(destfile.with_suffix('.bak'))
     write_outfile(oldrecords, destfile)
 
     return 0

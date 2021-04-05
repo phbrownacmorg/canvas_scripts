@@ -11,11 +11,13 @@ from upload_csv import constants, get_access_token, bytesOrStrPrintable
 def main(argv:List[str]) -> int:
 
     # get sessionless URL
-    token:str = get_access_token()
+    token:str = get_access_token('_attendance')
     cmd = ['curl',
            '-H', "Authorization: Bearer " + token,
-           '-F', 'id=4',
-           '-o', 'attendance-out.html',
+           '-F', 'id=4;url=https://rollcall.instructure.com/launch',
+           '-o', '/mnt/U/DEd/attendance-out.html',
+           #'https://converse.instructure.com/accounts/1/external_tools/4']
+           #'https://' + constants()['host'] + '/api/v1/accounts/1/external_tools']
            'https://' + constants()['host'] + '/api/v1/accounts/1/external_tools/sessionless_launch']
 
     # Lots of ways for things to go wrong in here, none of which can
@@ -28,4 +30,3 @@ def main(argv:List[str]) -> int:
     
 if __name__ == '__main__':
     sys.exit(main(sys.argv))
-

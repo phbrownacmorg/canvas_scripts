@@ -16,10 +16,12 @@ def constants() -> Dict[str, str]:
              'tokenfile': 'tokens.json' }
 
 # Get the access token for the host we're using
-def get_access_token() -> str:
+def get_access_token(suffix:str = '') -> str:
     tokfile = Path.home().joinpath('.ssh', (constants()['tokenfile']))
-    data = json.loads(tokfile.read_text())
-    return data[constants()['host']]
+    data:str = json.loads(tokfile.read_text())
+    key:str = constants()['host'] + suffix
+    #print(key)
+    return data[key]
 
 def last_upload_file(dir:Path) -> Path:
     return dir.joinpath(constants()['host'] + '-upload.txt')
