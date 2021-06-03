@@ -28,7 +28,7 @@ AGE=$((`/bin/date +%s` - $MODTIME))
 
 # Check for stale input data
 INPUTDIR=/mnt/Canvas_Data
-STALE_INPUT_THRESHOLD=0
+STALE_INPUT_THRESHOLD=7200
 INPUT_AGE=0
 for f in $INPUTDIR/*.csv ; do
     #echo $f
@@ -43,15 +43,15 @@ for f in $INPUTDIR/*.csv ; do
 done
 
 
-if [ "$ALL_DIGITS" != "0" ]; then
+if [ $INPUT_AGE -gt $STALE_INPUT_THRESHOLD ]; then
+    echo "CRITICAL - Stale input file(s) aged $INPUT_AGE sec"
+    exit $STATE_CRITICAL
+elif [ "$ALL_DIGITS" != "0" ]; then
     echo "OK - Last upload was $FILE_CONTENTS"
     exit $STATE_OK;
 elif [ $AGE -lt $CRIT ]; then
     echo "WARN - $FILE_CONTENTS - for $AGE sec"
     exit $STATE_WARN
-elif [ $INPUT_AGE -gt $STALE_INPUT_THRESHOLD ]; then
-    echo "CRITICAL - Stale input file(s) aged $INPUT_AGE sec"
-    exit $STATE_CRITICAL
 else 
     echo "CRITICAL - $FILE_CONTENTS"
     exit $STATE_CRITICAL
