@@ -52,7 +52,8 @@ def correct_case(coursename:str) -> str:
 
 goodterms:Tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2021-JA', '2021-SP', '2021-AS',
-                            '2021-BS', '2021-2S', '2021-3S')
+                            '2021-BS', '2021-2S', '2021-3S',
+                            '2122-FA', '2122-JA', '2122-SP')
 
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.

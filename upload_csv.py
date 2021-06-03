@@ -4,6 +4,7 @@
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04
 
 import json
+from datetime import datetime
 from pathlib import Path
 import subprocess
 import time
@@ -25,6 +26,26 @@ def get_access_token(suffix:str = '') -> str:
 
 def last_upload_file(dir:Path) -> Path:
     return dir.joinpath(constants()['host'] + '-upload.txt')
+
+# Return True iff there's fresh data in the inputdir
+def fresh_data(datadirs:Dict[str, Path]) -> bool:
+    stale_files:int = 0
+    inputfiles = datadirs['inputdir'].glob('*.csv')
+    last_upload_time = last_upload_file(datadirs['outputdir']).stat().st_mtime
+    latest_stale_time = 0
+    #print(last_upload_time)
+    for f in inputfiles:
+        modtime = f.stat().st_mtime
+        #print(f, modtime)
+        if modtime < (last_upload_time - 7200):
+            stale_files = stale_files + 1
+            latest_stale_time = max(modtime, latest_stale_time)
+    if stale_files > 0:
+        # Note this doesn't handle the time zone correctly
+        last_upload_file(datadirs['outputdir']).write_text(
+            '{0:d} stale files, latest modified {1}'.format(
+                stale_files, datetime.fromtimestamp(latest_stale_time).ctime()))
+    return (stale_files == 0)
 
 # Get the ID number of the last upload from the file where it's stored.
 # If there is no such file, just return -1 (no job).
