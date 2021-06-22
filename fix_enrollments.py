@@ -7,22 +7,41 @@ import re
 from typing import Dict, List, Set, Tuple
 
 def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
+    #print('Filtering enrollments')
     outrecords:List[Dict[str, str]] = []
+    
+    # course_subs is used to substitute one course for another.  The effect is
+    # basically the same as cross-listing.
     course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+
+    # course_doubles, a set of key-value pairs, is used to force anyone
+    # enrolled in the "key" course to also be enrolled in the "value" course,
+    # with the same role.
     course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
                                      "PSY281H.95-2021-JA": "PSY281.95-2021-JA" }
-    blacklist:Tuple[Tuple[str,str], ...] = (#('1412633', 'EDU299H.01-2021-JA'),
-                                            #('1412633', 'ENG299H.01-2021-JA'),
-                                            ('1531377', 'CHM203L.02-2021-SP'),
-                                            ('1504003', 'CHM203L.02-2021-SP'),
-                                            ('1508775', 'CHM203L.01-2021-SP'),
-                                            ('1528718', 'CHM203L.01-2021-SP'),
-                                            ('1524907', 'CHM203L.01-2021-SP'),
-                                            ('1346473', 'ENG525.S1-2021-SP'),
-                                            ('1563361', 'EDU592.Y6-2021-SP'),
-                                            ('1564738', 'EDU592.Y1-2021-AS'))
+
+    # blacklist simply removes a given person's enrollments in a given course
+    # from automatic processing.  From there, the desired result can be
+    # produced manually, without having it overwritten by the automatic
+    # process.  (Note that Canvas does *not* take any action if an enrollment
+    # is simply missing from the automatic enrollment list.)
+    blacklist:List[Tuple[str,str], ...] = \
+        [ #('1412633', 'EDU299H.01-2021-JA'),
+          #('1412633', 'ENG299H.01-2021-JA'),
+          #('1531377', 'CHM203L.02-2021-SP'),
+          #('1504003', 'CHM203L.02-2021-SP'),
+          #('1508775', 'CHM203L.01-2021-SP'),
+          #('1528718', 'CHM203L.01-2021-SP'),
+          #('1524907', 'CHM203L.01-2021-SP'),
+          #('1346473', 'ENG525.S1-2021-SP'),
+          #('1563361', 'EDU592.Y6-2021-SP'),
+          #('1564738', 'EDU592.Y1-2021-AS'),
+            ('1524391', 'EDU378.S1-2021-AS')
+        ]
+
     students:Set(str) = set()
     teachers:Set(str) = set()
+    #print(blacklist[0][0])
     for record in inrecords:
         # Massage record itself
         if record['course_id'] in course_subs.keys():
@@ -34,6 +53,8 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
 
         # Add the adjusted record to outrecords
         if not (record['user_id'], record['course_id']) in blacklist:
+            #if record['user_id'] == blacklist[0][0]:
+            #    print(record)
             outrecords.append(record)
 
         # Keep track of students and teachers
