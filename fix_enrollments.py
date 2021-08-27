@@ -36,7 +36,9 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
           #('1346473', 'ENG525.S1-2021-SP'),
           #('1563361', 'EDU592.Y6-2021-SP'),
           #('1564738', 'EDU592.Y1-2021-AS'),
-            ('1524391', 'EDU378.S1-2021-AS')
+          #('1524391', 'EDU378.S1-2021-AS'),
+            ('1083562', 'ART314.95-2122-FA'),
+            ('1083562', 'ART501.95-2122-FA')
         ]
 
     students:Set(str) = set()

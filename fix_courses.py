@@ -15,7 +15,8 @@ def correct_case(coursename:str) -> str:
                        'to', 'up', 'and', 'as', 'but', 'or', 'nor')  
     upcased_words = ('2-D', '3-D', '3D', 'BA', 'BFA', 'CAD', 'CW', 'DHH', 'DIS',
                      'EC', 'ECE', 'ESL', 'HPE', 'HS', 'ID', 'II', 'III', 'IV',
-                     'LA', 'LD', 'MIDI', 'MFT', 'MS', 'NATO', 'R2S', 'SP')
+                     'LA', 'LD', 'MIDI', 'MFT', 'MS', 'NATO', 'R2S', 'SP',
+                     'WWI', 'WWII')
     upcased_words_colons = ('DIS:', 'FYS:', 'HR:', 'II:', 'LA:', 'PD:', 'SP:')
     upcased_words_nocontext = ('D/HH')
     

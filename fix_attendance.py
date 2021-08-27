@@ -75,8 +75,10 @@ def main(argv:List[str]) -> int:
         newrecords.extend(read_from_csv(f))
         oldrecords = merge_attendances(oldrecords, newrecords)
     #print(oldrecords)
-    destfile.replace(destfile.with_suffix('.bak'))
-    write_outfile(oldrecords, destfile)
+    if len(oldrecords) > 0: # Don't write anything if there are no records
+        if destfile.exists(): # Only backup if there's a file to back up
+            destfile.replace(destfile.with_suffix('.bak'))
+        write_outfile(oldrecords, destfile)
 
     return 0
 
