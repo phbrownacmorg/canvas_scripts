@@ -26,12 +26,19 @@ def get_data_dirs() -> Dict[str, Path]:
 
 def main(argv:List[str]) -> int:
     filters = stem_list()
-    datadirs = get_data_dirs()
-    last_upload = get_last_upload(datadirs['outputdir'])
-    
+    datadirs:Dict[str, Path] = get_data_dirs()
+    last_upload:int = get_last_upload(datadirs['outputdir'])
+
+    do_filtering:bool = True
+    if len(argv) > 1 and argv[1] == '--upload-only':
+        do_filtering = False
+    # print(argv, do_filtering)
+   
     for stem in filters.keys():
         print(stem)
-        filter_csv(stem, datadirs, filters[stem])
+        if do_filtering:
+            print('Filtering...')
+            filter_csv(stem, datadirs, filters[stem])
         last_upload = upload(stem, datadirs['outputdir'], last_upload)
         
     write_last_upload(last_upload, datadirs['outputdir'])

@@ -6,20 +6,7 @@
 import re
 from typing import Dict, List, Set, Tuple
 
-def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
-    #print('Filtering enrollments')
-    outrecords:List[Dict[str, str]] = []
-    
-    # course_subs is used to substitute one course for another.  The effect is
-    # basically the same as cross-listing.
-    course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
-
-    # course_doubles, a set of key-value pairs, is used to force anyone
-    # enrolled in the "key" course to also be enrolled in the "value" course,
-    # with the same role.
-    course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
-                                     "PSY281H.95-2021-JA": "PSY281.95-2021-JA" }
-
+def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
     # blacklist simply removes a given person's enrollments in a given course
     # from automatic processing.  From there, the desired result can be
     # produced manually, without having it overwritten by the automatic
@@ -37,10 +24,38 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
           #('1563361', 'EDU592.Y6-2021-SP'),
           #('1564738', 'EDU592.Y1-2021-AS'),
           #('1524391', 'EDU378.S1-2021-AS'),
-            ('1083562', 'ART314.95-2122-FA'),
-            ('1083562', 'ART501.95-2122-FA')
+          #  ('1083562', 'ART314.95-2122-FA'),
+          # ('1083562', 'ART501.95-2122-FA')
         ]
 
+    result:bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
+
+    # Suppress active/inactive pairs
+    if result and (inrecord['status'] == 'inactive') \
+       and (last_outrecord['status'] == 'active') \
+       and (inrecord['user_id'] == last_outrecord['user_id']) \
+       and (inrecord['course_id'] == last_outrecord['course_id']):
+        result = False
+
+    return result
+
+
+def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
+    #print('Filtering enrollments')
+    outrecords:List[Dict[str, str]] = []
+    # Track the last record added to the outrecords
+    last_outrecord = {'status': None}
+    
+    # course_subs is used to substitute one course for another.  The effect is
+    # basically the same as cross-listing.
+    course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+
+    # course_doubles, a set of key-value pairs, is used to force anyone
+    # enrolled in the "key" course to also be enrolled in the "value" course,
+    # with the same role.
+    course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+                                     "PSY281H.95-2021-JA": "PSY281.95-2021-JA"}
+    
     students:Set(str) = set()
     teachers:Set(str) = set()
     #print(blacklist[0][0])
@@ -54,10 +69,12 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
             inrecords.append(newrecord)
 
         # Add the adjusted record to outrecords
-        if not (record['user_id'], record['course_id']) in blacklist:
+        #if not (record['user_id'], record['course_id']) in blacklist:
+        if ok_to_add(record, last_outrecord):
             #if record['user_id'] == blacklist[0][0]:
             #    print(record)
             outrecords.append(record)
+            last_outrecord = record
 
         # Keep track of students and teachers
         if record['role'] == 'student':
