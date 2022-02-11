@@ -26,6 +26,7 @@ def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
           #('1524391', 'EDU378.S1-2021-AS'),
           #  ('1083562', 'ART314.95-2122-FA'),
           # ('1083562', 'ART501.95-2122-FA')
+            ('1522966', 'EDU304.01-2122-SP')
         ]
 
     result:bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
