@@ -52,7 +52,8 @@ elif [ "$ALL_DIGITS" != "0" ]; then
 elif [ $AGE -lt $CRIT ]; then
     echo "WARN - $FILE_CONTENTS - for $AGE sec"
     exit $STATE_WARN
-else 
+else
+    
     echo "CRITICAL - $FILE_CONTENTS"
     exit $STATE_CRITICAL
 fi

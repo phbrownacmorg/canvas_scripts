@@ -27,6 +27,10 @@ def get_access_token(suffix:str = '') -> str:
 def last_upload_file(dir:Path) -> Path:
     return dir.joinpath(constants()['host'] + '-upload.txt')
 
+# Out here so it can be imported elsewhere
+def working_prefix() -> str:
+    return 'Working: last was '
+
 # Get the ID number of the last upload from the file where it's stored.
 # If there is no such file, just return -1 (no job).
 def get_last_upload(dir:Path) -> int:
@@ -39,7 +43,7 @@ def get_last_upload(dir:Path) -> int:
     # If a task starts before this one ends, make the other one fail fast.
     # The other one will try to read a number from the file and crash.
     # Effectively, this provides a file lock for the process.
-    fname.write_text('Working: last was ' + str(last_upload))
+    fname.write_text(working_prefix() + str(last_upload))
 
     return last_upload
 
