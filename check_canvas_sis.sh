@@ -16,7 +16,8 @@ while getopts "c:w:h" ARG; do
 	esac
 done
 #echo Crit: $CRIT
-STATFILE=/home/phbrown/bin/canvas_scripts/converse.instructure.com-upload.txt
+STATDIR=/home/phbrown/bin/canvas_scripts
+STATFILE=${STATDIR}/converse.instructure.com-upload.txt
 FILE_CONTENTS=`/usr/bin/head --bytes=100 $STATFILE`
 #echo FILE_CONTENTS is "$FILE_CONTENTS"
 ALL_DIGITS="$(expr "$FILE_CONTENTS" : '^[0-9]\+$')"
@@ -53,7 +54,7 @@ elif [ $AGE -lt $CRIT ]; then
     echo "WARN - $FILE_CONTENTS - for $AGE sec"
     exit $STATE_WARN
 else
-    
+    ${STATDIR}/autofix.py &
     echo "CRITICAL - $FILE_CONTENTS"
     exit $STATE_CRITICAL
 fi
