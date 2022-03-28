@@ -54,7 +54,9 @@ def correct_case(coursename:str) -> str:
 goodterms:Tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2021-JA', '2021-SP', '2021-AS',
                             '2021-BS', '2021-2S', '2021-3S',
-                            '2122-FA', '2122-JA', '2122-SP')
+                            '2122-FA', '2122-JA', '2122-SP',
+                            '2122-AS', '2122-BS', '2122-2S',
+                            '2223-FA', '2223-JA', '2223-SP')
 
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
@@ -88,4 +90,6 @@ def filter_courses(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     for record in inrecords:
         if valid_course(record):
             outrecords.append(filter_one_course(record))
+        else:
+            print('Course rejected: ', record)
     return outrecords
