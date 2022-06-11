@@ -29,7 +29,8 @@ AGE=$((`/bin/date +%s` - $MODTIME))
 
 # Check for stale input data
 INPUTDIR=/mnt/Canvas_Data
-STALE_INPUT_THRESHOLD=7200
+# 15 hours.  No update from 8 PM - 7 AM shouldn't cause an alarm.
+STALE_INPUT_THRESHOLD=54000
 INPUT_AGE=0
 for f in $INPUTDIR/*.csv ; do
     #echo $f

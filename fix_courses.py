@@ -87,9 +87,12 @@ def valid_course(record:Dict[str,str]) -> bool:
 # and returns the result of that filtering.
 def filter_courses(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
     outrecords:List[Dict[str, str]] = []
+    rejected_courses: List[str] = []
     for record in inrecords:
         if valid_course(record):
             outrecords.append(filter_one_course(record))
         else:
-            print('Course rejected: ', record['course_id'])
+            rejected_courses.append(record['course_id'])
+            #print('Course rejected: ', record['course_id'])
+    print('Rejected:', rejected_courses)
     return outrecords
