@@ -27,12 +27,14 @@ MODTIME=`/bin/date  --reference=$STATFILE +%s`
 AGE=$((`/bin/date +%s` - $MODTIME))
 #echo age = $AGE
 
-# Check for stale input data.  This finds the *oldest* input file.
+# Check for stale input data.
+# This will warn if *any* input file is stale (older than the threshold)
+# and return critical if *all* the input files are stale.
 INPUTDIR=/mnt/Canvas_Data
 # 15 hours.  No update from 8 PM - 7 AM shouldn't cause an alarm.
 STALE_INPUT_THRESHOLD=54000
 OLDEST_INPUT=0
-NEWEST_INPUT=86500000  # 1000 days
+NEWEST_INPUT=86500000  # 1000 days.  Assume no input file is older than this.
 for f in $INPUTDIR/*.csv ; do
     #echo $f
     INPUT_MOD=`/bin/date  --reference=$f +%s`
