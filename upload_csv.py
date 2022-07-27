@@ -3,9 +3,10 @@
 # Functions for uploading CSV files to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04
 
-import json
 from datetime import datetime
 from pathlib import Path
+import json
+import os
 import subprocess
 import time
 from typing import cast, Dict, List, Union
@@ -29,26 +30,58 @@ def last_upload_file(dir:Path) -> Path:
 
 # Out here so it can be imported elsewhere
 def working_prefix() -> str:
-    return 'Working: last was '
+    return 'Working:'
+
+def working_msg(pid: int, last_upload: int) -> str:
+    return working_prefix() + ' pid {0} last was {1}'.format(pid, last_upload)
+
+def timeout_prefix() -> str:
+    return 'Timed out:'
+
+def illegal_state_prefix() -> str:
+    return 'Illegal state:'
 
 # Get the ID number of the last upload from the file where it's stored.
 # If there is no such file, just return -1 (no job).
-def get_last_upload(dir:Path) -> int:
-    last_upload:int = -1
-    fname:Path = last_upload_file(dir)
+def get_last_upload(dir: Path) -> int:
+    last_upload: int = -1
+    prefix: str = ''
+    fname: Path = last_upload_file(dir)
     if fname.exists():
-        # The number should be the only thing in the file.
-        last_upload = int(fname.read_text()) 
-        
+        contents: str = fname.read_text()
+        tokens: List[str] = contents.split()
+        last_upload = int(tokens[-1]) # If the last token isn't a number, we're done.
+        prefix = ' '.join(tokens[:-1]) # Returns '' if the number is the only thing
+
+        if prefix == illegal_state_prefix():
+            raise RuntimeError(contents)
+        elif prefix.startswith(working_prefix()):
+            # Check whether the PID is still running
+            pid: int = int(tokens[2])
+            cmd = ['ps', '--no-headers', '--format', 
+                   'pid,stat,time,cmd', '--pid',
+                   str(pid)]
+            output:str = bytesOrStrPrintable(subprocess.check_output(cmd))
+            if output != '':
+                # Still running, raise RuntimeError
+                raise RuntimeError(contents)
+
+	# os.pid() to get current PID
+        # os.kill(pid, signal); signal is signal.SIGKILL on Unix
+        # I see nothing to query the status of another process; use 'ps" instead
+        # ps --format pid,stat,time,cmd --no-headers --pid pid
+        # output iff the proc exists
+
     # If a task starts before this one ends, make the other one fail fast.
     # The other one will try to read a number from the file and crash.
     # Effectively, this provides a file lock for the process.
-    fname.write_text(working_prefix() + str(last_upload))
+    fname.write_text(working_msg(os.getpid(), last_upload))
 
     return last_upload
 
-# Write the ID number of the last upload to the file
-def write_last_upload(idnum:int, dir:Path) -> None:
+# Write the ID number of the last upload to the file.
+# Alternatively, a preformatted message can be written.
+def write_last_upload(idnum: Union[int, str], dir:Path) -> None:
     fname:Path = last_upload_file(dir)
     fname.write_text(str(idnum))
 
@@ -80,8 +113,7 @@ def upload_complete(idnum:int) -> bool:
             complete = True
         elif data['workflow_state'] not in ('created', 'importing'):
             print(output)
-            raise RuntimeError(('Import {0} is neither done nor'
-                                + ' importing').format(idnum))
+            raise RuntimeError(illegal_state_prefix() + ' ' + str(idnum))
         else:
             # Gives some visual feedback if we have to wait for completion
             print(data['progress'], data['workflow_state'])
@@ -95,9 +127,9 @@ def wait_for_upload_complete(last_upload:int) -> bool:
     waited = 0     # Time waited so far (seconds)
     while waited < max_wait and not upload_complete(last_upload):
         waited = waited + wait_step
-        time.sleep(wait_step)    
+        time.sleep(wait_step)
     if waited >= max_wait:
-        raise RuntimeError('Import {0} took too long'.format(last_upload))
+        raise RuntimeError(timeout_prefix() + ' ' + str(last_upload))
     return True # If we get here, the upload completed successfully
 
 # Upload a CSV file to Canvas.  Return the ID of the upload job, so it
@@ -105,7 +137,7 @@ def wait_for_upload_complete(last_upload:int) -> bool:
 def upload(stem:str, dir:Path, last_upload:int) -> int:
     # First, figure out if the previous upload succeeded.
     wait_for_upload_complete(last_upload)
-    
+
     # Next, do this upload
     token = get_access_token()
     cmd = ['curl', '--silent', '--show-error',
