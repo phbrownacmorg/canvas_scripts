@@ -61,8 +61,11 @@ def get_last_upload(dir: Path) -> int:
             cmd = ['ps', '--no-headers', '--format', 
                    'pid,stat,time,cmd', '--pid',
                    str(pid)]
-            output:str = bytesOrStrPrintable(subprocess.check_output(cmd))
-            if output != '':
+            try:
+                output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
+            except subprocess.CalledProcessError as e:
+                output = e.output
+            else:
                 # Still running, raise RuntimeError
                 raise RuntimeError(contents)
 

@@ -42,6 +42,7 @@ def main(argv:List[str]) -> int:
                 filter_csv(stem, datadirs, filters[stem])
             last_upload = upload(stem, datadirs['outputdir'], last_upload)
     except RuntimeError as e:
+        #print('RuntimeError:', e.args[0])
         write_last_upload(e.args[0])
         raise RuntimeError(e)
     else:    
