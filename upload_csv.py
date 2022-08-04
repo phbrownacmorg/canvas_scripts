@@ -41,6 +41,14 @@ def timeout_prefix() -> str:
 def illegal_state_prefix() -> str:
     return 'Illegal state:'
 
+# Record a case where the previous upload failed, but the recovery procedure
+# was automated.
+def record_saving_throw(dir: Path, contents: str) -> None:
+    record_fname: Path = dir.joinpath('saving_throws.txt')
+    msg: str = str(datetime.now()) + ': ' + contents + '\n'
+    with open(record_fname, 'a') as f:
+        f.write(msg)
+
 # Get the ID number of the last upload from the file where it's stored.
 # If there is no such file, just return -1 (no job).
 def get_last_upload(dir: Path) -> int:
@@ -55,6 +63,8 @@ def get_last_upload(dir: Path) -> int:
 
         if prefix == illegal_state_prefix():
             raise RuntimeError(contents)
+        elif prefix.startswith(timeout_prefix()):
+            record_saving_throw(dir, contents)
         elif prefix.startswith(working_prefix()):
             # Check whether the PID is still running
             pid: int = int(tokens[2])
@@ -64,6 +74,7 @@ def get_last_upload(dir: Path) -> int:
             try:
                 output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
             except subprocess.CalledProcessError as e:
+                record_saving_throw(dir, contents)
                 output = e.output
             else:
                 # Still running, raise RuntimeError
