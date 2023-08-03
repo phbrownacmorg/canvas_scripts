@@ -20,8 +20,8 @@ def constants() -> Dict[str, str]:
 # Get the access token for the host we're using
 def get_access_token(suffix:str = '') -> str:
     tokfile = Path.home().joinpath('.ssh', (constants()['tokenfile']))
-    data:str = json.loads(tokfile.read_text())
-    key:str = constants()['host'] + suffix
+    data: dict = json.loads(tokfile.read_text())
+    key: str = constants()['host'] + suffix
     #print(key)
     return data[key]
 
