@@ -2,6 +2,7 @@
 
 # Functions for performing course backups
 
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import json
 import subprocess
@@ -62,17 +63,37 @@ def check_for_backup(course_id: int) -> dict:
         result = data[0]
     return result
 
+def recent(ISO_timestring: str) -> bool:
+    """Takes a datetime string in ISO format, and returns True if it is sufficiently
+    recent.  For this purpose "sufficiently recent" means less than a week old."""
+    result = True
+    then: datetime = datetime.fromisoformat(ISO_timestring)
+    now: datetime = datetime.now(timezone.utc)
+
+    if then > now:
+        result = False
+    else:
+        age: timedelta = now - then
+        max_age: timedelta = timedelta(7)
+        result = (age < max_age)
+
+    return result
+
 def maybe_create_backup(course_id: int) -> dict:
     """Poll Canvas to see when the given BACKUP_ID for the given COURSE_ID is complete.
     Effectively busy-wait until it does complete, albeit with a maximum number of tries."""
 
     # Does the backup already exist?
     data: dict = check_for_backup(course_id)
-    if 'attachment' not in data or data['export_type'] != 'common_cartridge': # No usable backup exists for this course
-        print('backing up', end='', flush=True)
+    if 'export_type' not in data or 'created_at' not in data \
+            or data['export_type'] != 'common_cartridge' \
+            or not recent(data['created_at']):  # No usable backup exists for this course
+        print('starting backup', end='', flush=True)
         data = start_course_backup(course_id)
-    elif 'attachment' in data and data['export_type'] == 'common_cartridge' and data['workflow_state'] == 'exported':
+    elif 'attachment' in data and data['workflow_state'] == 'exported':
         print('backed up', end=' ', flush=True)
+    else:
+        print('backing up', end='', flush=True)
 
     return data
 
