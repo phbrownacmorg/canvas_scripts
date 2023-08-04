@@ -67,6 +67,8 @@ def recent(ISO_timestring: str) -> bool:
     """Takes a datetime string in ISO format, and returns True if it is sufficiently
     recent.  For this purpose "sufficiently recent" means less than a week old."""
     result = True
+    if ISO_timestring.endswith('Z'):
+        ISO_timestring = ISO_timestring[:-1] + '+00:00'
     then: datetime = datetime.fromisoformat(ISO_timestring)
     now: datetime = datetime.now(timezone.utc)
 
