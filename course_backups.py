@@ -199,6 +199,10 @@ def maybe_download_backup(term: str, course: dict) -> None:
 
 def main(argv: list[str]) -> int:
     term: str = '2223-JA'
+    if (len(argv) > 1):
+        term = argv[1]
+    print(term)
+
     courselist: list[dict] = read_course_list(term)
     print(len(courselist), 'courses')
     # print_courses(courselist)
