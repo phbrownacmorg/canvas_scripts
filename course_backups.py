@@ -4,6 +4,7 @@
 
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import argparse
 import json
 import subprocess
 import sys
@@ -197,11 +198,18 @@ def maybe_download_backup(term: str, course: dict) -> None:
 #     backup_data = create_or_find_backup(course['canvas_course_id'])
 #     maybe_download_backup(term, course, backup_data)
 
+def parse_args(argv: list[str]) -> dict:
+    parser = argparse.ArgumentParser(prog='course_backups.py')
+    parser.add_argument('term', help='Term to back up')
+    parser.add_argument('--start', default=0, type=int, 
+                        help='Ordinal number (not ID) of course to start at')
+    args = parser.parse_args(argv)
+    return vars(args)
+
 def main(argv: list[str]) -> int:
-    term: str = '2223-JA'
-    if (len(argv) > 1):
-        term = argv[1]
-    print(term)
+    args: dict = parse_args(argv[1:])
+    print(args, flush=True)
+    term: str = args['term']
 
     courselist: list[dict] = read_course_list(term)
     print(len(courselist), 'courses')
@@ -209,9 +217,11 @@ def main(argv: list[str]) -> int:
 
     print(time.asctime(), flush=True)
     #courselist = courselist[350:360]
-    i = 0
-    for c in courselist:
+
+    i: int = args['start']
+    while i < len(courselist):
         print(i, end=' ')
+        c = courselist[i]
         print_course(c, ': ')
         maybe_create_backup(c['canvas_course_id'])
         maybe_download_backup(term, c)
