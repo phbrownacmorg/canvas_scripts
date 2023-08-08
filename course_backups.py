@@ -69,9 +69,7 @@ def fix_course_ids(courselist: list[dict], xlist: list[dict]) -> list[dict]:
     return sorted(coursedict.values(), key=lambda elt: elt['course_id'])
 
 
-def read_course_list(term: str) -> list[dict]:
-    reportsdir = Path.home().joinpath('Documents', 'DEd', 'Canvas', 'course_backups', 'reports')
-    # print(reportsdir)
+def read_course_list(term: str, reportsdir: Path) -> list[dict]:
     courses: list[dict] = read_from_csv(reportsdir.joinpath(term + '-courses.csv'))
     xlist: list[dict] = read_from_csv(reportsdir.joinpath(term + '-xlist.csv'))
     courses = fix_course_ids(courses, xlist)
@@ -170,11 +168,11 @@ def wait_for_completion(course_id: int) -> dict:
     #     print(data)    
     return data['attachment']
 
-def maybe_download_backup(term: str, course: dict) -> None:
+def maybe_download_backup(term: str, output_dir: Path, course: dict) -> None:
     """If the file doesn't already exist, download the backup file and store
        it in the proper directory with the right filename."""
     backup_data = wait_for_completion(course['canvas_course_id'])
-    output_dir = Path.home().joinpath('Documents', 'DEd', 'Canvas', 'course_backups')
+    
     filename = term + '_' + course['course_id'].replace('/', '+') + '_' + backup_data['filename']
     filepath = output_dir.joinpath(filename)
 
@@ -211,7 +209,9 @@ def main(argv: list[str]) -> int:
     print(args, flush=True)
     term: str = args['term']
 
-    courselist: list[dict] = read_course_list(term)
+    backups_dir = Path.home().joinpath('Documents', 'DEd', 'course_backups')
+    
+    courselist: list[dict] = read_course_list(term, Path.joinpath(backups_dir, 'reports'))
     print(len(courselist), 'courses')
     # print_courses(courselist)
 
@@ -224,7 +224,7 @@ def main(argv: list[str]) -> int:
         c = courselist[i]
         print_course(c, ': ')
         maybe_create_backup(c['canvas_course_id'])
-        maybe_download_backup(term, c)
+        maybe_download_backup(term, backups_dir, c)
         i += 1
     # for c in courselist:
     #     print_course(c, ': ')
