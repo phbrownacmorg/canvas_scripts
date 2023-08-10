@@ -138,3 +138,6 @@ dmypy.json
 
 # Ignore attendance-out.html
 attendance-out.html
+
+# VSCode stuff
+settings.json
