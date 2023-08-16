@@ -146,6 +146,7 @@ def wait_for_completion(course_id: int) -> dict:
     max_tries = 90
     tries: int = 0
     delay = 12
+    data = {}
     
     while not completed:
         data = check_for_backup(course_id)
