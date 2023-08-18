@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from typing import cast
+import csv
 import json
 import subprocess
 import sys
@@ -35,12 +36,12 @@ def find_quiz_numbers(course_IDs: list[int]) -> list[int]:
         output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
         data: list[dict] = json.loads(output)
         if len(data) > 1:
-            raise Exception('ERROR: course {0} has {1} info-fluency quizzes.  Data\n\t{2}'.format(id, len(data), data))
+            print('WARNING: course {0} has {1} info-fluency quizzes. Data\n\t{2}'.format(id, len(data), data))
         #print(id, data)
         if len(data) == 0:
             quizzes.append(0)
         else:
-            quizzes.append(data[0]['id'])
+            quizzes.append(data[-1]['id'])
 
     assert len(quizzes) == len(course_IDs)
     return quizzes
@@ -105,14 +106,38 @@ def get_report(course: int, status: dict) -> str:
            '--header', 'Authorization: Bearer ' + token, url]
     print(cmd)
     output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
-    # chunks = output.split('\n')
-    # for i in range(len(chunks)):
-    #     print(chunks[i])
     return output
 
-def write_report(contents: str, fname: str, outputdir: Path) -> None:
-    with open(outputdir.joinpath(fname), 'w') as f:
+def write_report(contents: str, outfilename: Path) -> None:
+    with open(outfilename, 'w') as f:
         f.write(contents)
+
+def filter_report(filename: Path, course_names: list[str]) -> None:
+    course_idx = 0
+    csv_rows: list[dict] = []
+    with open(filename, 'r') as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            # Suppress rows that are just repeats of the headers
+            if ('id' in row and row['id'] == 'id') \
+                    or ('Question Id' in row and row['Question Id'] == 'Question Id'):
+                course_idx += 1
+                print("Suppressing line; new section is", course_names[course_idx])
+            # Handle the actual data rows
+            else:
+                # Item analysis or empty section in student analysis: add the section
+                if 'Question Id' in row or \
+                        'section' in row and row['section'] == '':
+                    row['section'] = course_names[course_idx]
+                csv_rows.append(row)
+                #print("Added row", len(csv_rows))
+    
+    print(len(csv_rows))
+    assert len(csv_rows) > 0
+    with open(filename.with_stem(filename.stem[:-4]), 'w') as outfile:
+        writer = csv.DictWriter(outfile, fieldnames=csv_rows[0].keys())
+        writer.writeheader()
+        writer.writerows(csv_rows)
 
 def create_reports(course_IDs: list[int], course_names: list[str], quizzes: list[int], outputdir: Path) -> None:
     """Takes a list of numeric course ID's, a list of course names, and the directory
@@ -128,7 +153,7 @@ def create_reports(course_IDs: list[int], course_names: list[str], quizzes: list
 
     student_report = ''
     item_report = ''
-    for i in range(4): #(len(course_IDs)):
+    for i in range(len(course_IDs)):
         if quizzes[i] == 0:
             continue
         else:
@@ -142,20 +167,17 @@ def create_reports(course_IDs: list[int], course_names: list[str], quizzes: list
                     newstat = start_report(course_IDs[i], status)
                 report = get_report(course_IDs[i], newstat)
                 if newstat['report_type'] == 'student_analysis':
-                    # if len(student_report) > 0:
-                    #     report = report[1:]
-                    # student_report += '\n'.join(report)
                     student_report += report
                 else:
-                    # if len(item_report) > 0:
-                    #     report = report[1:]
-                    # item_report += '\n'.join(report)
                     item_report += report
-    write_report(student_report, course_stem + '_students.csv', outputdir)        
-    write_report(item_report, course_stem + '_items.csv', outputdir)        
-                
-                    
 
+    studentfile = outputdir.joinpath(course_stem + '_students_raw.csv')
+    write_report(student_report, studentfile)
+    filter_report(studentfile, course_names)
+
+    itemfile = outputdir.joinpath(course_stem + '_items_raw.csv')
+    write_report(item_report, itemfile)
+    filter_report(itemfile, course_names)
 
 def main(argv: list[str]) -> int:
     most_recent_fall = 'Fall_2022'
@@ -168,7 +190,8 @@ def main(argv: list[str]) -> int:
 
     FYS_courses = read_courses_from_file(info_lit_dir.joinpath('FYS-courses.csv'))
     #print(FYS_courses)
-
+    quizzes = find_quiz_numbers(FYS_courses[0])
+    create_reports(FYS_courses[0], FYS_courses[1], quizzes, info_lit_dir)
 
     return 0
 
