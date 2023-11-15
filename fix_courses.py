@@ -1,4 +1,4 @@
-#! /usr/bin/python3.8
+#! /usr/bin/python3
 
 # Filter to correct the case of course fullnames for import to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-15
@@ -10,7 +10,7 @@ from typing import Dict, List, Tuple
 
 # Make the case of coursename a little easier on the eyes than the
 # all-upper-case favored by the Registrar's Office.
-def correct_case(coursename:str) -> str:
+def correct_long_name(coursename:str) -> str:
     downcased_words = ('a', 'an', 'at', 'by', 'for', 'in', 'of', 'on',
                        'to', 'up', 'and', 'as', 'but', 'or', 'nor')  
     upcased_words = ('2-D', '3-D', '3D', 'BA', 'BFA', 'CAD', 'CW', 'DHH', 'DIS',
@@ -19,6 +19,8 @@ def correct_case(coursename:str) -> str:
                      'WWI', 'WWII')
     upcased_words_colons = ('DIS:', 'FYS:', 'HR:', 'II:', 'LA:', 'PD:', 'SP:')
     upcased_words_nocontext = ('D/HH')
+    replacements = { 'Intership' : 'Internship' }
+    
     
     # Force proper splits
     coursename = coursename.replace('&', ' & ')
@@ -33,6 +35,9 @@ def correct_case(coursename:str) -> str:
         # Usual case
         word:str = wordlist[i].capitalize()
         wordlist[i] = word
+
+        if word in replacements.keys():
+            wordlist[i] = replacements[word]
 
         # Now, handle the oddities.
         upperword:str = word.upper()
@@ -56,7 +61,11 @@ goodterms:Tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2021-BS', '2021-2S', '2021-3S',
                             '2122-FA', '2122-JA', '2122-SP',
                             '2122-AS', '2122-BS', '2122-2S', '2122-S3',
-                            '2223-FA', '2223-JA', '2223-SP')
+                            '2223-FA', '2223-JA', '2223-SP',
+                            '2223-AS', '2223-BS', '2223-2S', '2223-3S',
+                            '2324-SF', '2324-FA', '2324-JA',
+                            '2324-JS', '2324-SP', '2324-AS',
+                            '2324-BS', '2324-2S', '2324-3S')
 
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
@@ -68,7 +77,7 @@ def filter_one_course(inrec:Dict[str, str]) -> Dict[str, str]:
         if key not in keys_to_ignore:
             value = inrec[key]
             if key == 'long_name':
-                outrec['long_name'] = correct_case(value)
+                outrec['long_name'] = correct_long_name(value)
             elif value not in values_to_ignore:
                 outrec[key] = value
                 #if key == 'status' and inrec['term_id'] not in goodterms:
