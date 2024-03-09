@@ -4,15 +4,15 @@
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
 import re
-from typing import Dict, List, Set, Tuple
+from typing import cast
 
-def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
+def ok_to_add(inrecord:dict[str, str], last_outrecord:dict[str, str]) -> bool:
     # blacklist simply removes a given person's enrollments in a given course
     # from automatic processing.  From there, the desired result can be
     # produced manually, without having it overwritten by the automatic
     # process.  (Note that Canvas does *not* take any action if an enrollment
     # is simply missing from the automatic enrollment list.)
-    blacklist:List[Tuple[str,str], ...] = \
+    blacklist:list[tuple[str,str]] = \
         [ #('1412633', 'EDU299H.01-2021-JA'),
           #('1412633', 'ENG299H.01-2021-JA'),
           #('1531377', 'CHM203L.02-2021-SP'),
@@ -26,8 +26,20 @@ def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
           #('1524391', 'EDU378.S1-2021-AS'),
           #  ('1083562', 'ART314.95-2122-FA'),
           # ('1083562', 'ART501.95-2122-FA')
-            ('1522966', 'EDU304.01-2122-SP'),
-            ('1520119', 'EDU619B.E95-2122-SP')
+          #  ('1522966', 'EDU304.01-2122-SP'),
+          #  ('1520119', 'EDU619B.E95-2122-SP')
+          #  ('1526865', 'ART300.01-2223-SP'),
+          #  ('1511583', 'CHM315L.01-2223-SP'),
+          #  ('1536013', 'ECN201.01-2223-SP'),
+          #  ('1294527', 'ECN202.01-2223-SP'),
+          #  ('1563113', 'ACC211.01-2223-SP'),
+          #  ('1569305', 'EDU591.YB-2223-JA')
+          #  ('1569583', 'EDU592.Y8-2223-SP'),
+          #  ('1528694', 'DES382.95-2223-SP'),
+          #  ('1570779', 'EDU592.Y5-2223-SP')
+          #  ('1530067', 'ART501.97-2223-BS'),
+          #  ('1192472', 'PLP835.UC9-2223-BS')
+          ('1277493', 'SED390.02-2324-SP')
         ]
 
     result:bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
@@ -42,24 +54,24 @@ def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
     return result
 
 
-def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
+def filter_enrollments(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
     #print('Filtering enrollments')
-    outrecords:List[Dict[str, str]] = []
+    outrecords: list[dict[str, str]] = []
     # Track the last record added to the outrecords
-    last_outrecord = {'status': None}
+    last_outrecord: dict[str, str | None] = {'status': None}
     
     # course_subs is used to substitute one course for another.  The effect is
     # basically the same as cross-listing.
-    course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+    course_subs:dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
     # enrolled in the "key" course to also be enrolled in the "value" course,
     # with the same role.
-    course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+    course_doubles:dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
                                      "PSY281H.95-2021-JA": "PSY281.95-2021-JA"}
     
-    students:Set(str) = set()
-    teachers:Set(str) = set()
+    students: set[str] = set()
+    teachers: set[str] = set()
     #print(blacklist[0][0])
     for record in inrecords:
         # Massage record itself
@@ -72,11 +84,11 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
 
         # Add the adjusted record to outrecords
         #if not (record['user_id'], record['course_id']) in blacklist:
-        if ok_to_add(record, last_outrecord):
+        if ok_to_add(record, cast(dict[str, str], last_outrecord)):
             #if record['user_id'] == blacklist[0][0]:
             #    print(record)
             outrecords.append(record)
-            last_outrecord = record
+            last_outrecord = cast(dict[str, str | None], record)
 
         # Keep track of students and teachers
         if record['role'] == 'student':
@@ -85,10 +97,10 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
             teachers.add(record['user_id'])
 
     for s in students:
-        record:Dict[str, str] = {'course_id': 'passport_to_canvas',
-                                 'root_account': '', 'user_id': s, 'user_integration_id': '',
-                                 'role': 'student', 'section_id': '','status': 'active',
-                                 'associated_user_id': '', 'limit_section_priveleges': '' }
+        record = {'course_id': 'passport_to_canvas',
+                  'root_account': '', 'user_id': s, 'user_integration_id': '',
+                  'role': 'student', 'section_id': '','status': 'active',
+                  'associated_user_id': '', 'limit_section_priveleges': '' }
         outrecords.append(record)
         record = {'course_id': 'C@C', 'root_account': '', 'user_id': s,
                   'user_integration_id': '', 'role': 'observer',
@@ -97,10 +109,10 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
         outrecords.append(record)
 
     for t in teachers:
-        record:Dict[str, str] = {'course_id': 'growing_with_canvas',
-                                 'root_account': '', 'user_id': t, 'user_integration_id': '',
-                                 'role': 'student', 'section_id': '','status': 'active',
-                                 'associated_user_id': '', 'limit_section_priveleges': '' }
+        record = {'course_id': 'growing_with_canvas',
+                  'root_account': '', 'user_id': t, 'user_integration_id': '',
+                  'role': 'student', 'section_id': '','status': 'active',
+                  'associated_user_id': '', 'limit_section_priveleges': '' }
         outrecords.append(record)
         record = {'course_id': 'C@C', 'root_account': '', 'user_id': t,
                   'user_integration_id': '', 'role': 'observer',

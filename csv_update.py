@@ -6,14 +6,13 @@
 
 from pathlib import Path
 import sys
-from typing import Dict, List
 from filter_csv import filter_csv, stem_list
 from upload_csv import get_last_upload, write_last_upload, upload
 
 # ------------------- filtering ----------------------------------------
 
 # Returns a dict of the infile and outfile directories
-def get_data_dirs() -> Dict[str, Path]:
+def get_data_dirs() -> dict[str, Path]:
     all_paths = {'linux': {'inputdir': Path('/mnt').joinpath('Canvas_Data'),
                            'outputdir': Path.home().joinpath('bin',
                                                              'canvas_scripts')},
@@ -24,9 +23,9 @@ def get_data_dirs() -> Dict[str, Path]:
 
 ## ----- uploading --------------------------------------------------
 
-def main(argv:List[str]) -> int:
+def main(argv:list[str]) -> int:
     filters = stem_list()
-    datadirs:Dict[str, Path] = get_data_dirs()
+    datadirs:dict[str, Path] = get_data_dirs()
     try:
         last_upload:int = get_last_upload(datadirs['outputdir'])
 

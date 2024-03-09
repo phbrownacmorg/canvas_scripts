@@ -34,7 +34,7 @@ def filter_attendance_record(inrec:Dict[str, str]) -> Dict[str, str]:
     goodkeys:List[str] = ['Class Date', 'Course Code', 'Student Name',
                           'SIS Student ID','Attendance', 'Badges', 'Never showed',
                           'Teacher Name','Course Name','Section Name']
-    for key in goodkeys: # type: str
+    for key in goodkeys:
         outrec[key] = inrec[key]
     return outrec
 
@@ -49,7 +49,7 @@ def merge_attendances(oldrecords:List[Dict[str, str]],
     OLDRECORDS, and returns the result.  Neither NEWRECORDS nor
     OLDRECORDS is modified."""
     result:List[Dict[str, str]] = oldrecords[:]
-    for rec in newrecords: # type: Dict[str, str]
+    for rec in newrecords:
         outrec:Dict[str, str] = filter_attendance_record(rec)
         if outrec not in result:
             result.append(outrec)
