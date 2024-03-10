@@ -15,14 +15,26 @@ def parse_args(argv: list[str]) -> dict[str,Any]:
     args = parser.parse_args(argv)
     return vars(args)
 
-def online(course_id: str) -> bool:
-    return '.9' in course_id or '.UC9' in course_id or '.E9' in course_id or '.M9' in course_id 
+def online(c: dict[str, Any]) -> bool:
+    is_online = 'modality' in c and c['modality'] == 'online'
+    if 'modality' not in c:
+        course_id = c['course_id']
+        is_online = '.9' in course_id or '.UC9' in course_id or '.E9' in course_id or '.M9' in course_id 
+    return is_online
 
-def hybrid(course_id: str) -> bool:
-    return '.Y' in course_id or '.Z' in course_id
+def hybrid(c: dict[str, Any]) -> bool:
+    is_hybrid = 'modality' in c and c['modality'] == 'hybrid'
+    if 'modality' not in c:
+        course_id = c['course_id']
+        is_hybrid = '.Y' in course_id or '.Z' in course_id
+    return is_hybrid
 
-def undergraduate(course_id: str) -> bool:
-    return course_id[3] < '5'
+def undergraduate(c: dict[str, Any]) -> bool:
+    under = 'division' in c and 'U' in c['division']
+    if 'division' not in c:
+        course_id = c['course_id']
+        under = course_id[3] < '5'
+    return under
 
 def main(argv: list[str]) -> int:
     args: dict[str,Any] = parse_args(argv[1:])
@@ -37,9 +49,9 @@ def main(argv: list[str]) -> int:
 
     print(time.asctime(), flush=True)
 
-    onlines: list[dict[str, Any]] = [c for c in courselist if online(c['course_id']) and undergraduate(c['course_id'])]
+    onlines: list[dict[str, Any]] = [c for c in courselist if online(c) and undergraduate(c)]
     print('onlines:', len(onlines))
-    hybrids: list[dict[str, Any]] = [c for c in courselist if hybrid(c['course_id']) and undergraduate(c['course_id'])]
+    hybrids: list[dict[str, Any]] = [c for c in courselist if hybrid(c) and undergraduate(c)]
     print('hybrids', len(hybrids))
 
     all = onlines + hybrids
