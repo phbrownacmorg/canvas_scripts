@@ -65,7 +65,9 @@ goodterms:Tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2223-AS', '2223-BS', '2223-2S', '2223-3S',
                             '2324-SF', '2324-FA', '2324-JA',
                             '2324-JS', '2324-SP', '2324-AS',
-                            '2324-BS', '2324-2S', '2324-3S')
+                            '2324-BS', '2324-2S', '2324-3S',
+                            '2425-FA', '2425-JA', '2425-SP',
+                            '2425-AS', '2425-BS', '2425-2S')
 
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
