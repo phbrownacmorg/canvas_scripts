@@ -4,15 +4,15 @@
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
 import re
-from typing import Dict, List, Set, Tuple
+from typing import cast
 
-def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
+def ok_to_add(inrecord:dict[str, str], last_outrecord:dict[str, str]) -> bool:
     # blacklist simply removes a given person's enrollments in a given course
     # from automatic processing.  From there, the desired result can be
     # produced manually, without having it overwritten by the automatic
     # process.  (Note that Canvas does *not* take any action if an enrollment
     # is simply missing from the automatic enrollment list.)
-    blacklist:List[Tuple[str,str], ...] = \
+    blacklist:list[tuple[str,str]] = \
         [ #('1412633', 'EDU299H.01-2021-JA'),
           #('1412633', 'ENG299H.01-2021-JA'),
           #('1531377', 'CHM203L.02-2021-SP'),
@@ -56,24 +56,24 @@ def ok_to_add(inrecord:Dict[str, str], last_outrecord:Dict[str, str]) -> bool:
     return result
 
 
-def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
+def filter_enrollments(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
     #print('Filtering enrollments')
-    outrecords:List[Dict[str, str]] = []
+    outrecords: list[dict[str, str]] = []
     # Track the last record added to the outrecords
-    last_outrecord = {'status': None}
+    last_outrecord: dict[str, str | None] = {'status': None}
     
     # course_subs is used to substitute one course for another.  The effect is
     # basically the same as cross-listing.
-    course_subs:Dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+    course_subs:dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
     # enrolled in the "key" course to also be enrolled in the "value" course,
     # with the same role.
-    course_doubles:Dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+    course_doubles:dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
                                      "PSY281H.95-2021-JA": "PSY281.95-2021-JA"}
     
-    students:Set(str) = set()
-    teachers:Set(str) = set()
+    students: set[str] = set()
+    teachers: set[str] = set()
     #print(blacklist[0][0])
     for record in inrecords:
         # Massage record itself
@@ -86,11 +86,11 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
 
         # Add the adjusted record to outrecords
         #if not (record['user_id'], record['course_id']) in blacklist:
-        if ok_to_add(record, last_outrecord):
+        if ok_to_add(record, cast(dict[str, str], last_outrecord)):
             #if record['user_id'] == blacklist[0][0]:
             #    print(record)
             outrecords.append(record)
-            last_outrecord = record
+            last_outrecord = cast(dict[str, str | None], record)
 
         # Keep track of students and teachers
         if record['role'] == 'student':
@@ -99,10 +99,10 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
             teachers.add(record['user_id'])
 
     for s in students:
-        record:Dict[str, str] = {'course_id': 'passport_to_canvas',
-                                 'root_account': '', 'user_id': s, 'user_integration_id': '',
-                                 'role': 'student', 'section_id': '','status': 'active',
-                                 'associated_user_id': '', 'limit_section_priveleges': '' }
+        record = {'course_id': 'passport_to_canvas',
+                  'root_account': '', 'user_id': s, 'user_integration_id': '',
+                  'role': 'student', 'section_id': '','status': 'active',
+                  'associated_user_id': '', 'limit_section_priveleges': '' }
         outrecords.append(record)
         record = {'course_id': 'C@C', 'root_account': '', 'user_id': s,
                   'user_integration_id': '', 'role': 'observer',
@@ -111,10 +111,10 @@ def filter_enrollments(inrecords:List[Dict[str, str]]) -> List[Dict[str, str]]:
         outrecords.append(record)
 
     for t in teachers:
-        record:Dict[str, str] = {'course_id': 'growing_with_canvas',
-                                 'root_account': '', 'user_id': t, 'user_integration_id': '',
-                                 'role': 'student', 'section_id': '','status': 'active',
-                                 'associated_user_id': '', 'limit_section_priveleges': '' }
+        record = {'course_id': 'growing_with_canvas',
+                  'root_account': '', 'user_id': t, 'user_integration_id': '',
+                  'role': 'student', 'section_id': '','status': 'active',
+                  'associated_user_id': '', 'limit_section_priveleges': '' }
         outrecords.append(record)
         record = {'course_id': 'C@C', 'root_account': '', 'user_id': t,
                   'user_integration_id': '', 'role': 'observer',

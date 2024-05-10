@@ -5,14 +5,14 @@
 
 from datetime import datetime
 from pathlib import Path
+from typing import Any, cast
 import json
 import os
 import subprocess
 import time
-from typing import cast, Dict, List, Union
 
 # Set constants, using a dict instead of global variables
-def constants() -> Dict[str, str]:
+def constants() -> dict[str, str]:
     return { #'host': 'converse.beta.instructure.com',
              'host': 'converse.instructure.com',
              'tokenfile': 'tokens.json' }
@@ -20,10 +20,10 @@ def constants() -> Dict[str, str]:
 # Get the access token for the host we're using
 def get_access_token(suffix:str = '') -> str:
     tokfile = Path.home().joinpath('.ssh', (constants()['tokenfile']))
-    data: dict = json.loads(tokfile.read_text())
+    data: dict[str, Any] = json.loads(tokfile.read_text())
     key: str = constants()['host'] + suffix
     #print(key)
-    return data[key]
+    return cast(str, data[key])
 
 def last_upload_file(dir:Path) -> Path:
     return dir.joinpath(constants()['host'] + '-upload.txt')
@@ -57,7 +57,7 @@ def get_last_upload(dir: Path) -> int:
     fname: Path = last_upload_file(dir)
     if fname.exists():
         contents: str = fname.read_text()
-        tokens: List[str] = contents.split()
+        tokens: list[str] = contents.split()
         last_upload = int(tokens[-1]) # If the last token isn't a number, we're done.
         prefix = ' '.join(tokens[:-1]) # Returns '' if the number is the only thing
 
@@ -95,13 +95,13 @@ def get_last_upload(dir: Path) -> int:
 
 # Write the ID number of the last upload to the file.
 # Alternatively, a preformatted message can be written.
-def write_last_upload(idnum: Union[int, str], dir:Path) -> None:
+def write_last_upload(idnum: int | str, dir:Path) -> None:
     fname:Path = last_upload_file(dir)
     fname.write_text(str(idnum))
 
 # Take a byte sequence or a string and return a string, so it's known
 # to be printable.
-def bytesOrStrPrintable(instring:Union[str,bytes]) -> str:
+def bytesOrStrPrintable(instring: str | bytes) -> str:
     """Take a bytestring or string INSTRING and convert it to a string."""
     outstring = instring
     try:
@@ -162,7 +162,7 @@ def upload(stem:str, dir:Path, last_upload:int) -> int:
     # reasonably be caught.  Therefore, don't bother with try-except.
     output = bytesOrStrPrintable(subprocess.check_output(cmd))
     resultval = json.loads(output)
-    uploadID = resultval['id']
+    uploadID: int = cast(int, resultval['id'])
     print(uploadID)
     print()
     return uploadID
