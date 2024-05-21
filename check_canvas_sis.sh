@@ -60,7 +60,7 @@ elif [ $OLDEST_INPUT -gt $STALE_INPUT_THRESHOLD ]; then
 elif [ "$ALL_DIGITS" != "0" ]; then
     echo "OK - Last upload was $FILE_CONTENTS"
     exit $STATE_OK;
-elif [ $AGE -lt $CRIT ]; then
+elif [ $AGE -gt $CRIT ]; then
     echo "WARN - $FILE_CONTENTS - for $AGE sec"
     exit $STATE_WARNING
 else
