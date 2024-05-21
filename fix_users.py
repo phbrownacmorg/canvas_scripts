@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 
 # Filter to correct the punctuation of users' fullnames for import to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-27

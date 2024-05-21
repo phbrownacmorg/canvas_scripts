@@ -1,18 +1,17 @@
-#! /usr/bin/python3
 
 # Filter to add training-course enrollments to enrollments.csv
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
 import re
-from typing import cast
+from typing import cast, Optional
 
-def ok_to_add(inrecord:dict[str, str], last_outrecord:dict[str, str]) -> bool:
+def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
     # blacklist simply removes a given person's enrollments in a given course
     # from automatic processing.  From there, the desired result can be
     # produced manually, without having it overwritten by the automatic
     # process.  (Note that Canvas does *not* take any action if an enrollment
     # is simply missing from the automatic enrollment list.)
-    blacklist:list[tuple[str,str]] = \
+    blacklist: list[tuple[str,str]] = \
         [ #('1412633', 'EDU299H.01-2021-JA'),
           #('1412633', 'ENG299H.01-2021-JA'),
           #('1531377', 'CHM203L.02-2021-SP'),
@@ -44,7 +43,7 @@ def ok_to_add(inrecord:dict[str, str], last_outrecord:dict[str, str]) -> bool:
             ('1530207', 'PSY480.01-2324-SP')
         ]
 
-    result:bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
+    result: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
 
     # Suppress active/inactive pairs
     if result and (inrecord['status'] == 'inactive') \
@@ -56,7 +55,7 @@ def ok_to_add(inrecord:dict[str, str], last_outrecord:dict[str, str]) -> bool:
     return result
 
 
-def filter_enrollments(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
+def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     #print('Filtering enrollments')
     outrecords: list[dict[str, str]] = []
     # Track the last record added to the outrecords
@@ -64,12 +63,12 @@ def filter_enrollments(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
     
     # course_subs is used to substitute one course for another.  The effect is
     # basically the same as cross-listing.
-    course_subs:dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+    course_subs: dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
     # enrolled in the "key" course to also be enrolled in the "value" course,
     # with the same role.
-    course_doubles:dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+    course_doubles: dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
                                      "PSY281H.95-2021-JA": "PSY281.95-2021-JA"}
     
     students: set[str] = set()
@@ -90,7 +89,7 @@ def filter_enrollments(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
             #if record['user_id'] == blacklist[0][0]:
             #    print(record)
             outrecords.append(record)
-            last_outrecord = cast(dict[str, str | None], record)
+            last_outrecord = cast(dict[str, Optional[str]], record)
 
         # Keep track of students and teachers
         if record['role'] == 'student':

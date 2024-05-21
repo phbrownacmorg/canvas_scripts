@@ -1,11 +1,10 @@
-#! /usr/bin/python3
 
 # Functions for uploading CSV files to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, cast, Union
 import json
 import os
 import subprocess
@@ -95,13 +94,13 @@ def get_last_upload(dir: Path) -> int:
 
 # Write the ID number of the last upload to the file.
 # Alternatively, a preformatted message can be written.
-def write_last_upload(idnum: int | str, dir:Path) -> None:
+def write_last_upload(idnum: Union[int, str], dir: Path) -> None:
     fname:Path = last_upload_file(dir)
     fname.write_text(str(idnum))
 
 # Take a byte sequence or a string and return a string, so it's known
 # to be printable.
-def bytesOrStrPrintable(instring: str | bytes) -> str:
+def bytesOrStrPrintable(instring: Union[str, bytes]) -> str:
     """Take a bytestring or string INSTRING and convert it to a string."""
     outstring = instring
     try:
@@ -111,7 +110,7 @@ def bytesOrStrPrintable(instring: str | bytes) -> str:
     return cast(str, outstring)
 
 # Check whether the upload with id IDNUM has finished yet.
-def upload_complete(idnum:int) -> bool:
+def upload_complete(idnum: int) -> bool:
     complete = (idnum == -1)
     if not complete:
         token = get_access_token()
@@ -135,7 +134,7 @@ def upload_complete(idnum:int) -> bool:
 
 # Wait for the upload with id LAST_UPLOAD to complete, using a loop.
 # If the upload takes *too* long, raise an exception.
-def wait_for_upload_complete(last_upload:int) -> bool:
+def wait_for_upload_complete(last_upload: int) -> bool:
     max_wait = 1000 # Max time to wait (seconds)
     wait_step = 5  # Wait time each time around the loop (seconds)
     waited = 0     # Time waited so far (seconds)
@@ -148,7 +147,7 @@ def wait_for_upload_complete(last_upload:int) -> bool:
 
 # Upload a CSV file to Canvas.  Return the ID of the upload job, so it
 # can be checked whether the job is done before starting another.
-def upload(stem:str, dir:Path, last_upload:int) -> int:
+def upload(stem: str, dir: Path, last_upload: int) -> int:
     # First, figure out if the previous upload succeeded.
     wait_for_upload_complete(last_upload)
 
@@ -163,6 +162,6 @@ def upload(stem:str, dir:Path, last_upload:int) -> int:
     output = bytesOrStrPrintable(subprocess.check_output(cmd))
     resultval = json.loads(output)
     uploadID: int = cast(int, resultval['id'])
-    print(uploadID)
+    print('Upload ID:', uploadID)
     print()
     return uploadID

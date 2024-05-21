@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python3.9
 
 # Filter to correct the case of course fullnames for import to Canvas.
 # Input comes from one CSV file, and output is written to another.

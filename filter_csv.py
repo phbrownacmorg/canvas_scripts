@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 
 # Functions to filter Canvas SIS CSV files prior to uploading them.
 # Peter Brown <peter.brown@converse.edu>, 2020-08-04
@@ -59,6 +58,7 @@ def read_from_csv(infile:Path) -> list[dict[str, str]]:
 def write_outfile(records: list[dict[str, str]], outfile:Path) -> None:
     # Pre: for all 0 <= i < j < len(records),
     #              records[i].keys() == records[j].keys()
+    print(f'Writing {len(records)} records to {outfile}')
     with open(outfile, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=records[0].keys())
         writer.writeheader()

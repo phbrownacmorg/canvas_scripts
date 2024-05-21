@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python3.9
 
 # Functions to filter Canvas attendance reports
 # Peter Brown <peter.brown@converse.edu>, 2021-03-03

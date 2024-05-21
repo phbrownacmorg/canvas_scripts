@@ -1,4 +1,3 @@
-#! /usr/bin/python3
 
 # Filter to correct the case of course fullnames for import to Canvas.
 # Peter Brown <peter.brown@converse.edu>, 2020-07-15
@@ -105,4 +104,7 @@ def filter_courses(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
             rejected_courses.append(record['course_id'])
             #print('Course rejected: ', record['course_id'])
     print('Rejected:', rejected_courses)
+    # Post:
+    assert len(inrecords) - len(rejected_courses) == len(outrecords), \
+        f"{len(inrecords)} - {len(rejected_courses)} != {len(outrecords)}"
     return outrecords
