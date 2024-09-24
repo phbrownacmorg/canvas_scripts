@@ -36,7 +36,11 @@ STALE_INPUT_THRESHOLD=54000
 OLDEST_INPUT=0
 NEWEST_INPUT=86500000  # 1000 days.  Assume no input file is older than this.
 for f in $INPUTDIR/*.csv ; do
-    #echo $f
+    echo $f
+    # Exclude accounts.csv (which is manually generated) from age-checking
+    if [ "$f" == "${INPUTDIR}/accounts.csv" ] ; then
+	continue
+    fi
     INPUT_MOD=`/bin/date  --reference=$f +%s`
     #echo $INPUT_MOD
     THIS_AGE=$((`/bin/date +%s` - $INPUT_MOD))

@@ -8,6 +8,19 @@
 from pathlib import Path
 from typing import Any, cast
 
+goodterms: tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
+                            '2021-JA', '2021-SP', '2021-AS',
+                            '2021-BS', '2021-2S', '2021-3S',
+                            '2122-FA', '2122-JA', '2122-SP',
+                            '2122-AS', '2122-BS', '2122-2S', '2122-S3',
+                            '2223-FA', '2223-JA', '2223-SP',
+                            '2223-AS', '2223-BS', '2223-2S', '2223-3S',
+                            '2324-SF', '2324-FA', '2324-JA',
+                            '2324-JS', '2324-SP', '2324-AS',
+                            '2324-BS', '2324-2S', '2324-3S',
+                            '2425-FA', '2425-JA', '2425-SP',
+                            '2425-AS', '2425-BS', '2425-2S')
+
 # Make the course's long name a little easier on the eyes than the
 # all-upper-case favored by the Registrar's Office.
 def correct_long_name(coursename: str) -> str:
@@ -54,18 +67,12 @@ def correct_long_name(coursename: str) -> str:
             
     return ' '.join(wordlist)
 
-goodterms: tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
-                            '2021-JA', '2021-SP', '2021-AS',
-                            '2021-BS', '2021-2S', '2021-3S',
-                            '2122-FA', '2122-JA', '2122-SP',
-                            '2122-AS', '2122-BS', '2122-2S', '2122-S3',
-                            '2223-FA', '2223-JA', '2223-SP',
-                            '2223-AS', '2223-BS', '2223-2S', '2223-3S',
-                            '2324-SF', '2324-FA', '2324-JA',
-                            '2324-JS', '2324-SP', '2324-AS',
-                            '2324-BS', '2324-2S', '2324-3S',
-                            '2425-FA', '2425-JA', '2425-SP',
-                            '2425-AS', '2425-BS', '2425-2S')
+def adjust_account(account_id: str, course_id: str) -> str:
+    result: str = account_id
+    prefix: str = course_id[:3]
+    if prefix == 'ATA':
+        result = prefix
+    return result
 
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
@@ -78,6 +85,8 @@ def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
             value = inrec[key]
             if key == 'long_name':
                 outrec['long_name'] = correct_long_name(value)
+            elif key == 'account_id':
+                outrec['account_id'] = adjust_account(value, inrec['course_id'])
             elif value not in values_to_ignore:
                 outrec[key] = value
                 #if key == 'status' and inrec['term_id'] not in goodterms:
