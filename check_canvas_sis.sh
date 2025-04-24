@@ -39,17 +39,17 @@ for f in $INPUTDIR/*.csv ; do
     echo $f
     # Exclude accounts.csv (which is manually generated) from age-checking
     if [ "$f" == "${INPUTDIR}/accounts.csv" ] ; then
-	continue
+	    continue
     fi
     INPUT_MOD=`/bin/date  --reference=$f +%s`
     #echo $INPUT_MOD
     THIS_AGE=$((`/bin/date +%s` - $INPUT_MOD))
     #echo $THIS_AGE
     if [ $THIS_AGE -lt $NEWEST_INPUT ]; then
-	NEWEST_INPUT=$THIS_AGE
+	    NEWEST_INPUT=$THIS_AGE
     fi
     if [ $THIS_AGE -gt $OLDEST_INPUT ]; then
-	OLDEST_INPUT=$THIS_AGE
+	    OLDEST_INPUT=$THIS_AGE
     fi
     #echo $OLDEST_INPUT
 done
