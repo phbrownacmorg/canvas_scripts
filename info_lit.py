@@ -10,6 +10,7 @@ import time
 import urllib.parse
 from course_backups import recent
 from filter_csv import read_from_csv
+from typing import Any
 from upload_csv import constants, get_access_token, bytesOrStrPrintable
 
 def read_courses_from_file(filename: Path) -> tuple[list[int], list[str]]:
@@ -17,7 +18,7 @@ def read_courses_from_file(filename: Path) -> tuple[list[int], list[str]]:
     Canvas provisioning report).  Returns a tuple for which the first element
     is the list of course ID numbers, and the second element is the list of
     course names (effectively shortnames)."""
-    courses: list[dict] = read_from_csv(filename)
+    courses: list[dict[str,str]] = read_from_csv(filename)
     numbers: list[int] = cast(list[int], [crs['canvas_course_id'] for crs in courses])
     names: list[str] = [crs['course_id'] for crs in courses]
     return numbers, names
@@ -34,7 +35,7 @@ def find_quiz_numbers(course_IDs: list[int]) -> list[int]:
                 '?search_term=information-fluency']
         print(cmd)
         output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
-        data: list[dict] = json.loads(output)
+        data: list[dict[str,Any]] = json.loads(output)
         if len(data) > 1:
             print('WARNING: course {0} has {1} info-fluency quizzes. Data\n\t{2}'.format(id, len(data), data))
         #print(id, data)
@@ -46,17 +47,17 @@ def find_quiz_numbers(course_IDs: list[int]) -> list[int]:
     assert len(quizzes) == len(course_IDs)
     return quizzes
 
-def get_report_status(course: int, quiz: int) -> list[dict]:
+def get_report_status(course: int, quiz: int) -> list[dict[str,Any]]:
     token = get_access_token()
     cmd = ['curl', '--no-progress-meter', '--show-error', 
                 '--header', 'Authorization: Bearer ' + token,
                 'https://{0}/api/v1/courses/{1}/quizzes/{2}/reports'.format(constants()['host'], course, quiz)]
     print(cmd)
     output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
-    data: list[dict] = json.loads(output)
+    data: list[dict[str,Any]] = json.loads(output)
     return data
 
-def get_one_report_status(course: int, status: dict) -> dict:
+def get_one_report_status(course: int, status: dict[str, Any]) -> dict[str, Any]:
     assert 'quiz_id' in status, str(status)
     token = get_access_token()
     cmd = ['curl', '--no-progress-meter', '--show-error', 
@@ -66,10 +67,10 @@ def get_one_report_status(course: int, status: dict) -> dict:
                                                                                 status['id'])]
     print(cmd)
     output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
-    data: dict = json.loads(output)
+    data: dict[str, Any] = json.loads(output)
     return data 
 
-def start_report(course: int, old_status: dict)-> dict:
+def start_report(course: int, old_status: dict[str,Any])-> dict[str,Any]:
     token = get_access_token()
     token = get_access_token()
     cmd = ['curl', '--no-progress-meter', '--show-error', 
@@ -80,10 +81,10 @@ def start_report(course: int, old_status: dict)-> dict:
     print(cmd)
     output: str = bytesOrStrPrintable(subprocess.check_output(cmd))
     #print(output)
-    data = json.loads(output)
+    data: dict[str,Any] = json.loads(output)
     return data
 
-def get_report(course: int, status: dict) -> str:
+def get_report(course: int, status: dict[str,Any]) -> str:
     # First, check if the report is available
     delay = 12
     max_tries = 50
@@ -114,7 +115,7 @@ def write_report(contents: str, outfilename: Path) -> None:
 
 def filter_report(filename: Path, course_names: list[str]) -> None:
     course_idx = 0
-    csv_rows: list[dict] = []
+    csv_rows: list[dict[str,str]] = []
     with open(filename, 'r') as infile:
         reader = csv.DictReader(infile)
         for row in reader:
@@ -157,7 +158,7 @@ def create_reports(course_IDs: list[int], course_names: list[str], quizzes: list
         if quizzes[i] == 0:
             continue
         else:
-            quiz_status: list[dict] = get_report_status(course_IDs[i], quizzes[i])
+            quiz_status: list[dict[str,Any]] = get_report_status(course_IDs[i], quizzes[i])
             assert len(quiz_status) == 2
             for status in quiz_status:
                 #print(course_IDs[i], status)
@@ -180,7 +181,7 @@ def create_reports(course_IDs: list[int], course_names: list[str], quizzes: list
     filter_report(itemfile, course_names)
 
 def main(argv: list[str]) -> int:
-    most_recent_fall = 'Fall_2022'
+    most_recent_fall = 'Fall_2024'
     info_lit_dir = Path.home().joinpath('Documents', 'DEd', 'info-literacy', most_recent_fall)
     SSS_courses = read_courses_from_file(info_lit_dir.joinpath('SSS-courses.csv'))
     #print(SSS_courses)
