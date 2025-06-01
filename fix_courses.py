@@ -19,7 +19,8 @@ goodterms: tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2324-JS', '2324-SP', '2324-AS',
                             '2324-BS', '2324-2S', '2324-3S',
                             '2425-FA', '2425-JA', '2425-SP',
-                            '2425-AS', '2425-BS', '2425-2S')
+                            '2425-AS', '2425-BS', '2425-2S',
+                            '2526-FA', '2526-JA', '2526-SP')
 
 # Make the course's long name a little easier on the eyes than the
 # all-upper-case favored by the Registrar's Office.
@@ -28,7 +29,7 @@ def correct_long_name(coursename: str) -> str:
                        'to', 'up', 'and', 'as', 'but', 'or', 'nor')  
     upcased_words = ('2-D', '3-D', '3D', 'BA', 'BFA', 'CAD', 'CW', 'DHH', 'DIS',
                      'EC', 'ECE', 'ESL', 'HPE', 'HS', 'ID', 'II', 'III', 'IV',
-                     'LA', 'LD', 'MIDI', 'MFT', 'MS', 'NATO', 'R2S', 'SP',
+                     'IX', 'LA', 'LD', 'MIDI', 'MFT', 'MS', 'NATO', 'R2S', 'SP',
                      'WWI', 'WWII')
     upcased_words_colons = ('DIS:', 'FYS:', 'HR:', 'II:', 'LA:', 'PD:', 'SP:')
     replacements = { 'Intership' : 'Internship' }
