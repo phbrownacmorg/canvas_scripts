@@ -17,8 +17,10 @@ def identity_filter(records: list[dict[str, str]]) -> list[dict[str, str]]:
 # Returns a dict of the stems and their associated filters
 def stem_list() -> dict[str, Callable[[list[dict[str, str]]],
                                       list[dict[str, str]]]]:
-    return {'accounts': identity_filter, 'users': filter_users,
-            'Courses' : filter_courses, 'Enrollments': filter_enrollments }
+    return {'accounts': identity_filter,
+            'users': filter_users,
+            'Courses' : filter_courses,
+            'Enrollments': filter_enrollments }
 
 # Reads a CSV file into a list of dictionaries, one dictionary per
 # row of data in the CSV file.  For each row, the keys of the dict are
@@ -53,6 +55,17 @@ def read_from_csv(infile:Path) -> list[dict[str, str]]:
     # The dictReader guarantees this is true, BTW.
     return records
 
+def read_manual_enrollments() -> list[dict[str, str]]:
+    """If manual_enrollments.csv exists in the current directory, read
+       and return the enrollment records contained in it."""
+    records: list[dict[str, str]] = []
+    infile = Path(__file__).parent.joinpath('manual_enrollments.csv')
+    print(infile)
+    if infile.is_file():
+        records = read_from_csv(infile)
+    return records
+
+
 # Takes a list of records--each a dictionary--and writes them to a CSV
 # file.
 def write_outfile(records: list[dict[str, str]], outfile:Path) -> None:
@@ -77,3 +90,7 @@ def filter_csv(stem:str, data_dirs:dict[str, Path],
     outrecords: list[dict[str, str]] = stem_filter(inrecords)
     outfile:Path = data_dirs['outputdir'].joinpath(stem + '.csv')
     write_outfile(outrecords, outfile)
+
+
+if __name__ == '__main__':
+    print(read_manual_enrollments())

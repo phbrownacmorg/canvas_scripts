@@ -24,8 +24,8 @@ def get_data_dirs() -> dict[str, Path]:
 ## ----- uploading --------------------------------------------------
 
 def main(argv:list[str]) -> int:
-    filters = stem_list()
     datadirs:dict[str, Path] = get_data_dirs()
+    filters = stem_list()
     try:
         last_upload:int = get_last_upload(datadirs['outputdir'])
 

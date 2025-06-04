@@ -2,6 +2,7 @@
 # Filter to add training-course enrollments to enrollments.csv
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
+import filter_csv # for read_manual_enrollments()
 import re
 from typing import cast, Optional
 
@@ -55,20 +56,24 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           ('1579526', 'EDU592.Y3-2425-BS')
         ]
 
-    result: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
+    ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
 
     # Suppress active/inactive pairs
-    if result and (inrecord['status'] == 'inactive') \
+    if ok and (inrecord['status'] == 'inactive') \
        and (last_outrecord['status'] == 'active') \
        and (inrecord['user_id'] == last_outrecord['user_id']) \
        and (inrecord['course_id'] == last_outrecord['course_id']):
-        result = False
+        ok = False
 
-    return result
+    return ok
 
 
 def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     #print('Filtering enrollments')
+
+    # Add the manual enrollments, if any
+    inrecords.extend(filter_csv.read_manual_enrollments())
+
     outrecords: list[dict[str, str]] = []
     # Track the last record added to the outrecords
     last_outrecord: dict[str, str | None] = {'status': None}
@@ -86,6 +91,7 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     students: set[str] = set()
     teachers: set[str] = set()
     #print(blacklist[0][0])
+
     for record in inrecords:
         # Massage record itself
         if record['course_id'] in course_subs.keys():
@@ -132,5 +138,5 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
                   'section_id': '', 'status': 'active',
                   'associated_user_id': '', 'limit_section_priveleges': ''}
         outrecords.append(record)
-                                 
+        
     return outrecords
