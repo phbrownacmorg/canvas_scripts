@@ -4,11 +4,11 @@
 
 import csv
 from pathlib import Path
-import sys
-from typing import Callable
+from collections.abc import Callable
 from fix_users import filter_users
 from fix_courses import filter_courses
 from fix_enrollments import filter_enrollments
+from fix_terms import filter_terms
 
 # Almost-empty filter just returns a shallow copy of the input.
 def identity_filter(records: list[dict[str, str]]) -> list[dict[str, str]]:
@@ -20,7 +20,8 @@ def stem_list() -> dict[str, Callable[[list[dict[str, str]]],
     return {'accounts': identity_filter,
             'users': filter_users,
             'Courses' : filter_courses,
-            'Enrollments': filter_enrollments }
+            'Enrollments': filter_enrollments,
+            'Terms': filter_terms }
 
 # Reads a CSV file into a list of dictionaries, one dictionary per
 # row of data in the CSV file.  For each row, the keys of the dict are

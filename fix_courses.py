@@ -5,8 +5,8 @@
 # get_data_dirs function added, 2020-07-31
 # Changed from a standalone program to a library, 2020-08-04
 
-from pathlib import Path
-from typing import Any, cast
+#from pathlib import Path
+from typing import cast
 
 goodterms: tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2021-JA', '2021-SP', '2021-AS',
