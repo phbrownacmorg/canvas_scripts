@@ -136,7 +136,7 @@ def maybe_download_backup(term: str, output_dir: Path, course: dict[str, Any]) -
 
 def parse_args(argv: list[str]) -> dict[str, Any]:
     parser = argparse.ArgumentParser(prog='course_backups.py')
-    parser.add_argument('--term', default='2425-JA', help='Term to back up')
+    parser.add_argument('term', help='Term to back up')
     parser.add_argument('--start', default=0, type=int, 
                         help='Ordinal number (not ID) of course to start at')
     args = parser.parse_args(argv)
