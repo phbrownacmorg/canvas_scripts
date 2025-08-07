@@ -19,7 +19,7 @@ def stem_list() -> dict[str, Callable[[list[dict[str, str]]],
                                       list[dict[str, str]]]]:
     return {'accounts': identity_filter,
             'users': filter_users,
-            'Courses' : filter_courses#,
+            'Courses' : filter_courses,
             'Enrollments': filter_enrollments,
             'Terms': filter_terms
             }
