@@ -91,7 +91,8 @@ def fix_course_ids(courselist: list[dict[str, Any]], xlist: list[dict[str, Any]]
         # If the next xlist line refers to the same host course, we're not done
         # accumulating ids.        
         if (i == len(xlist) - 1) or (xlist[i+1]['xlist_course_id'] != host_id):
-            if len(ids) > 1:
+            # More than one id *and* the merging hasn't already been done
+            if len(ids) > 1 and '/' not in coursedict[host_id]['course_id']:
                 coursedict[host_id]['course_id'] = make_course_id(ids)
             ids = []
 #    new_courselist = [c for c in coursedict.values() if c['course_id']
@@ -111,8 +112,8 @@ def set_modality(courselist: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def set_division(courselist: list[dict[str, Any]]) -> list[dict[str, Any]]:
     specials: dict[str, str] = {'MUH-graduate-exams-2122-FA': 'G',
                                 'MUH-graduate-exams-2021-FA': 'G'}
-    num_RE = '([0-9]{3}[A-Z]?)'
-    prefix_RE = '[A-Z]{3}'
+    num_RE = '(?P<num>[0-9]{3}[A-Z]?)'
+    prefix_RE = '[A-Z]{3}(/[A-Z]{3})*'
 
     for i in range(len(courselist)):
         c = courselist[i]
@@ -123,8 +124,8 @@ def set_division(courselist: list[dict[str, Any]]) -> list[dict[str, Any]]:
             assert len(course_id) > 6, f"No course_id: {c}"
             first_num = re.match(prefix_RE + num_RE, course_id)
             assert first_num is not None, f"'{c['course_id']}' ({i}) does not match '{prefix_RE + num_RE}'"
-            num = first_num.group(1)
-            assert num[0] in '012345678', f"'{c['course_id']}' yields '{num}' ({prefix_RE + num_RE})"
+            num = first_num.group('num')
+            assert num[0] in '012345678', f"'{c['course_id']}' yields subscriptable '{num}' ({prefix_RE + num_RE})"
             if num[0] in '01234':
                 c['division'] = 'U'
             else:
@@ -136,7 +137,7 @@ def set_division(courselist: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 if not first_num:
                     first_num = re.match(prefix_RE + num_RE, course_id)
                 assert first_num is not None, f"'{course_id}' does not match '{prefix_RE + num_RE}' ('{c['course_id']}')"
-                num = first_num.group(1)
+                num = first_num.group('num')
                 assert num[0] in '012345678', f"'{c['course_id']}' yields '{num}'"
                 if num[0] in '01234' and c['division'] == 'G':
                     c['division'] = 'U/G'
