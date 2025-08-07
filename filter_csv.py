@@ -19,9 +19,10 @@ def stem_list() -> dict[str, Callable[[list[dict[str, str]]],
                                       list[dict[str, str]]]]:
     return {'accounts': identity_filter,
             'users': filter_users,
-            'Courses' : filter_courses,
+            'Courses' : filter_courses#,
             'Enrollments': filter_enrollments,
-            'Terms': filter_terms }
+            'Terms': filter_terms
+            }
 
 # Reads a CSV file into a list of dictionaries, one dictionary per
 # row of data in the CSV file.  For each row, the keys of the dict are

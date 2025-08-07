@@ -79,7 +79,7 @@ def adjust_account(account_id: str, course_id: str) -> str:
 # correcting the case of the course long_name.
 def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
     values_to_ignore = ['', 'NULL', '00:00.0']
-    keys_to_ignore = ['course_format', 'blueprint_course_id']
+    keys_to_ignore = ['course_format']
     outrec: dict[str, str] = {}
     for key in inrec.keys():
         if key not in keys_to_ignore:
@@ -94,6 +94,7 @@ def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
                 #    outrec['status'] = 'deleted'
             else:
                 outrec[key] = ''
+    outrec['blueprint_course_id'] = 'blueprint'
     return outrec
 
 # Determine whether the course represented by RECORD should be entered
