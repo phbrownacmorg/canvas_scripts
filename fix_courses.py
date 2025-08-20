@@ -33,13 +33,13 @@ def correct_long_name(coursename: str) -> str:
                      'WWI', 'WWII')
     upcased_words_colons = ('DIS:', 'FYS:', 'HR:', 'II:', 'LA:', 'PD:', 'SP:')
     replacements = { 'Intership' : 'Internship' }
-    
+
     # Force proper splits
     coursename = coursename.replace('&', ' & ')
     splitchars: tuple[str, ...] = cast(tuple[str, ...], (':', ','))
     for ch in splitchars:
         coursename = coursename.replace(ch, ch + ' ')
-  
+
     wordlist = coursename.split()
 
     # Skip the first two words, which are the course prefix and number
@@ -65,14 +65,17 @@ def correct_long_name(coursename: str) -> str:
         # "D/HH" is upcased regardless of context
         elif 'd/hh' in lowerword:
             wordlist[i] = word.replace('d/hh', 'D/HH').replace('D/hh', 'D/HH')
-            
+
     return ' '.join(wordlist)
 
 def adjust_account(account_id: str, course_id: str) -> str:
+    account_exceptions: dict[str, str] = { 'ATA': 'ATA', 'AST': 'CH', 'PHY': 'CH' }
     result: str = account_id
     prefix: str = course_id[:3]
-    if prefix == 'ATA':
-        result = prefix
+    if prefix in account_exceptions:
+        result = account_exceptions[prefix]
+#    if prefix == 'ATA':
+#        result = prefix
     return result
 
 # Filter the record for one course, removing empty and NULL fields and
