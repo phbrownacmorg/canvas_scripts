@@ -15,11 +15,13 @@ done
 COUNT=`netstat -an | grep :13389 | wc -l`
 # echo $COUNT listening
 
+OUTFILE=/mnt/U/DEd/cst_state.txt
+
 if [ "$COUNT" == "2" ]; then
-    echo "OK - $COUNT listening"
+    echo "OK - $COUNT listening" | tee ${OUTFILE}
     exit $STATE_OK
 else
-    echo "WARN - $COUNT listening"
+    echo "WARN - $COUNT listening" | tee ${OUTFILE}
     exit $STATE_WARNING
 fi
 

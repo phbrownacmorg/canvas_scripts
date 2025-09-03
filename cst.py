@@ -16,6 +16,7 @@ def main(args: list[str]) -> int:
     rq: str = check_rq()
     if rq.count('.') == 3 and rq.replace('.','').isdigit():
         print('Numeric')
+        
     return 0
 
 if __name__ == '__main__':
