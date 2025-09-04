@@ -5,12 +5,12 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, cast
+from urllib.parse import ParseResult, parse_qs, urlparse, urlunparse
 import argparse
 import json
 import subprocess
 import sys
 import time
-import urllib.parse
 from read_courses import print_course, read_course_list
 from upload_csv import constants, get_access_token, bytesOrStrPrintable
 
@@ -117,12 +117,12 @@ def maybe_download_backup(term: str, output_dir: Path, course: dict[str, Any]) -
     if filepath.exists() and filepath.stat().st_size == backup_data['size']:
         print('downloaded already')
     else:
-        urlparts = urllib.parse.urlparse(backup_data['url'])
-        queryparts = urllib.parse.parse_qs(urlparts.query)
-        url = urllib.parse.urlunparse([urlparts.scheme, urlparts.netloc, urlparts.path, '',
-                                       'verifier=' + queryparts['verifier'][0], ''])
+        urlparts: ParseResult = cast(ParseResult, urlparse(backup_data['url']))
+        queryparts = parse_qs(urlparts.query)
+        url = urlunparse([urlparts.scheme, urlparts.netloc, urlparts.path, '',
+                                'verifier=' + queryparts['verifier'][0], ''])
         token = get_access_token()
-        cmd = ['curl', '--no-progress-meter', '--show-error', '--location',
+        cmd: list[str] = ['curl', '--no-progress-meter', '--show-error', '--location',
                 '--header', 'Authorization: Bearer ' + token, 
                 '--output-dir', str(output_dir), '--output', filename, url]
         # print(cmd)
