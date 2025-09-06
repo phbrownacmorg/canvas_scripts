@@ -82,13 +82,18 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     
     # course_subs is used to substitute one course for another.  The effect is
     # basically the same as cross-listing.
-    course_subs: dict[str, str] = { "PSY100.95-2021-FA" : "PSY100.95A-2021-FA" }
+    course_subs: dict[str, str] = {
+        # "PSY100.95-2021-FA" : "PSY100.95A-2021-FA"
+        "EDU 592.Y2-2526-FA" : "EDU592.y2-2526-FA"
+    }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
     # enrolled in the "key" course to also be enrolled in the "value" course,
     # with the same role.
-    course_doubles: dict[str,str] = { "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
-                                     "PSY281H.95-2021-JA": "PSY281.95-2021-JA"}
+    course_doubles: dict[str,str] = {
+        # "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
+        # "PSY281H.95-2021-JA": "PSY281.95-2021-JA"
+    }
     
     students: set[str] = set()
     teachers: set[str] = set()
