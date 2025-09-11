@@ -55,7 +55,8 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           # ('1579486', 'EDU592.Y5-2425-BS'),
           # ('1579526', 'EDU592.Y3-2425-BS')
           ('1580389', 'EDU594.Y1-2526-FA'),
-          ('1580041', 'EDU594.Y1-2526-FA')
+          ('1580041', 'EDU594.Y1-2526-FA'),
+          ('1566006', 'MUE621.01-2526-FA')
         ]
 
     ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
