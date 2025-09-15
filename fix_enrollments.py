@@ -85,7 +85,7 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     # basically the same as cross-listing.
     course_subs: dict[str, str] = {
         # "PSY100.95-2021-FA" : "PSY100.95A-2021-FA"
-        "EDU 592.Y2-2526-FA" : "EDU592.y2-2526-FA"
+        "EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA"
     }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
