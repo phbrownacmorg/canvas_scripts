@@ -18,12 +18,16 @@ def fix_initials(fullname:str) -> str:
 def filter_one_user(inrec:dict[str, str]) -> dict[str, str]:
     values_to_ignore = ['', 'NULL', '00:00.0']
     keys_to_ignore = ['integration_id', 'password']
+    email_aliases = {'Mequilia.Sizemore@converse.edu':
+                     'Mequila.Sizemore@converse.edu'}
     outrec:dict[str, str] = {}
     for key in inrec.keys():
         if key not in keys_to_ignore:
             value = inrec[key]
             if key == 'full_name':
                 outrec['full_name'] = fix_initials(value)
+            elif key in ('login_id', 'email') and value in email_aliases:
+                outrec[key] = email_aliases[value]
             elif value not in values_to_ignore:
                 outrec[key] = value
             else:

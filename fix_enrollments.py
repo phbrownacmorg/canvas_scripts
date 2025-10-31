@@ -56,7 +56,9 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           # ('1579526', 'EDU592.Y3-2425-BS')
           ('1580389', 'EDU594.Y1-2526-FA'),
           ('1580041', 'EDU594.Y1-2526-FA'),
-          ('1566006', 'MUE621.01-2526-FA')
+          ('1566006', 'MUE621.01-2526-FA'),
+          ('1563935', 'EDU592.Y2-2526-FA'),
+          ('1563935', 'EDU592.y2-2526-FA')
         ]
 
     ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
@@ -85,7 +87,8 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     # basically the same as cross-listing.
     course_subs: dict[str, str] = {
         # "PSY100.95-2021-FA" : "PSY100.95A-2021-FA"
-        "EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA"
+        "EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA",
+        "HPE245.01-2526-SP" : "HPE245.o1-2526-SP"
     }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
