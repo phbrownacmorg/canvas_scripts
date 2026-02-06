@@ -54,25 +54,25 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           # ('1579486', 'EDU591.Y2-2425-BS'),
           # ('1579486', 'EDU592.Y5-2425-BS'),
           # ('1579526', 'EDU592.Y3-2425-BS')
-          ('1580389', 'EDU594.Y1-2526-FA'),
-          ('1580041', 'EDU594.Y1-2526-FA'),
-          ('1566006', 'MUE621.01-2526-FA'),
-          ('1563935', 'EDU592.Y2-2526-FA'),
-          ('1563935', 'EDU592.y2-2526-FA'),
-          ('1166384', 'EDU591.Y3-2526-FA'),
-          ('1237222', 'EDU591.Y3-2526-FA'),
-          ('1580425', 'EDU591.Y3-2526-FA'),
-          ('1580426', 'EDU591.Y3-2526-FA'),
-          ('1580427', 'EDU591.Y3-2526-FA'),
-          ('1580428', 'EDU591.Y3-2526-FA'),
-          ('1580429', 'EDU591.Y3-2526-FA'),
-          ('1580430', 'EDU591.Y3-2526-FA'),
-          ('1580431', 'EDU591.Y3-2526-FA'),
-          ('1580433', 'EDU591.Y3-2526-FA'),
-          ('1580442', 'EDU591.Y3-2526-FA'),
-          ('1580463', 'EDU591.Y3-2526-FA'),
-          ('1580464', 'EDU591.Y3-2526-FA'),
-          ('1580490', 'EDU591.Y3-2526-FA')
+          # ('1580389', 'EDU594.Y1-2526-FA'),
+          # ('1580041', 'EDU594.Y1-2526-FA'),
+          # ('1566006', 'MUE621.01-2526-FA'),
+          # ('1563935', 'EDU592.Y2-2526-FA'),
+          # ('1563935', 'EDU592.y2-2526-FA'),
+          # ('1166384', 'EDU591.Y3-2526-FA'),
+          # ('1237222', 'EDU591.Y3-2526-FA'),
+          # ('1580425', 'EDU591.Y3-2526-FA'),
+          # ('1580426', 'EDU591.Y3-2526-FA'),
+          # ('1580427', 'EDU591.Y3-2526-FA'),
+          # ('1580428', 'EDU591.Y3-2526-FA'),
+          # ('1580429', 'EDU591.Y3-2526-FA'),
+          # ('1580430', 'EDU591.Y3-2526-FA'),
+          # ('1580431', 'EDU591.Y3-2526-FA'),
+          # ('1580433', 'EDU591.Y3-2526-FA'),
+          # ('1580442', 'EDU591.Y3-2526-FA'),
+          # ('1580463', 'EDU591.Y3-2526-FA'),
+          # ('1580464', 'EDU591.Y3-2526-FA'),
+          # ('1580490', 'EDU591.Y3-2526-FA')
         ]
 
     ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
@@ -101,8 +101,9 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     # basically the same as cross-listing.
     course_subs: dict[str, str] = {
         # "PSY100.95-2021-FA" : "PSY100.95A-2021-FA"
-        "EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA",
-        "HPE245.01-2526-SP" : "HPE245.o1-2526-SP"
+        #"EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA",
+        "HPE245.01-2526-SP" : "HPE245.o1-2526-SP",
+        "SED598.95-2526-SP" : "SED598.9s-2526-SP"
     }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
@@ -111,6 +112,7 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     course_doubles: dict[str,str] = {
         # "BIO309H.01-2021-JA": "BIO309.01-2021-JA",
         # "PSY281H.95-2021-JA": "PSY281.95-2021-JA"
+        'BIO302H.01-2526-SP': 'BIO302.01-2526-SP'
     }
     
     students: set[str] = set()

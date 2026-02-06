@@ -20,17 +20,20 @@ goodterms: tuple[str,...] = ('2021-SF', '2021-FA', '2021-JS',
                             '2324-BS', '2324-2S', '2324-3S',
                             '2425-FA', '2425-JA', '2425-SP',
                             '2425-AS', '2425-BS', '2425-2S',
-                            '2526-FA', '2526-JA', '2526-SP')
+                            '2526-FA', '2526-JA', '2526-SP',
+                            '2526-AS', '2526-BS', '2526-2S')
+goodsuffixes: tuple[str,...] = ('FA', 'JA', 'SP',
+                                'AS', 'BS', '2S', '3S')
 
 # Make the course's long name a little easier on the eyes than the
 # all-upper-case favored by the Registrar's Office.
 def correct_long_name(coursename: str) -> str:
     downcased_words = ('a', 'an', 'at', 'by', 'for', 'in', 'of', 'on',
                        'to', 'up', 'and', 'as', 'but', 'or', 'nor')  
-    upcased_words = ('2-D', '3-D', '3D', 'BA', 'BFA', 'CAD', 'CW', 'DHH', 'DIS',
-                     'EC', 'ECE', 'ESL', 'HPE', 'HS', 'ID', 'II', 'III', 'IV',
-                     'IX', 'LA', 'LD', 'MIDI', 'MFT', 'MS', 'NATO', 'R2S', 'SP',
-                     'WWI', 'WWII')
+    upcased_words = ('2-D', '3-D', '3D', 'BA', 'BFA', 'CAD', 'CPR', 'CW',
+                     'DHH', 'DIS', 'EC', 'ECE', 'ESL', 'HPE', 'HS', 'ID',
+                     'II', 'III', 'IV', 'IX', 'LA', 'LD', 'MIDI', 'MFT',
+                     'MS', 'NATO', 'R2S', 'SP', 'WWI', 'WWII')
     upcased_words_colons = ('DIS:', 'FYS:', 'HR:', 'II:', 'LA:', 'PD:', 'SP:')
     replacements = { 'Intership' : 'Internship' }
 
@@ -78,6 +81,13 @@ def adjust_account(account_id: str, course_id: str) -> str:
 #        result = prefix
     return result
 
+def filter_dates(start_date: str, end_date: str) -> tuple[str, str]:
+    # Only let the dates go through if *both* are specified.
+    result = (start_date, end_date)
+    if len(start_date) == 0 or len(end_date) == 0:
+        result = ('','')
+    return result
+
 # Filter the record for one course, removing empty and NULL fields and
 # correcting the case of the course long_name.
 def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
@@ -91,6 +101,9 @@ def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
                 outrec['long_name'] = correct_long_name(value)
             elif key == 'account_id':
                 outrec['account_id'] = adjust_account(value, inrec['course_id'])
+            elif key in ['start_date', 'end_date']:
+                outrec['start_date'], outrec['end_date'] = \
+                    filter_dates(inrec['start_date'], inrec['end_date'])
             elif value not in values_to_ignore:
                 outrec[key] = value
                 #if key == 'status' and inrec['term_id'] not in goodterms:
@@ -103,7 +116,8 @@ def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
 # Determine whether the course represented by RECORD should be entered
 # in Canvas or not.
 def valid_course(record: dict[str,str]) -> bool:
-    result:bool = (record['term_id'] in goodterms)
+    result:bool = (record['term_id'][-2:] in goodsuffixes)
+    #(record['term_id'] in goodterms)
     return result
 
 # Takes a list of course records, each one a dictionary, filters them,

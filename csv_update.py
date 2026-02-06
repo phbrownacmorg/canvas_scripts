@@ -44,7 +44,7 @@ def main(argv:list[str]) -> int:
         #print('RuntimeError:', e.args[0])
         write_last_upload(e.args[0], datadirs['outputdir'])
         raise RuntimeError(e)
-    else:    
+    else:
         write_last_upload(str(last_upload), datadirs['outputdir'])
     return 0
 
