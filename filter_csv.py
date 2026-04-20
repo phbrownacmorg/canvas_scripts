@@ -17,11 +17,11 @@ def identity_filter(records: list[dict[str, str]]) -> list[dict[str, str]]:
 # Returns a dict of the stems and their associated filters
 def stem_list() -> dict[str, Callable[[list[dict[str, str]]],
                                       list[dict[str, str]]]]:
-    return {'accounts': identity_filter,
+    return {'Enrollments': filter_enrollments,
             'users': filter_users,
             'Courses' : filter_courses,
-            'Enrollments': filter_enrollments,
-            'Terms': filter_terms
+            'Terms': filter_terms,
+            'accounts': identity_filter
             }
 
 # Reads a CSV file into a list of dictionaries, one dictionary per

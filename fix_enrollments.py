@@ -4,6 +4,7 @@
 
 import filter_csv # for read_manual_enrollments()
 import re
+from fix_courses import course_id_ok
 from typing import cast, Optional
 
 def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
@@ -73,6 +74,7 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           # ('1580463', 'EDU591.Y3-2526-FA'),
           # ('1580464', 'EDU591.Y3-2526-FA'),
           # ('1580490', 'EDU591.Y3-2526-FA')
+          ('1579778', 'MUH103.01-2526-SP')
         ]
 
     ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
@@ -102,8 +104,9 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     course_subs: dict[str, str] = {
         # "PSY100.95-2021-FA" : "PSY100.95A-2021-FA"
         #"EDU592.Y2-2526-FA" : "EDU592.y2-2526-FA",
-        "HPE245.01-2526-SP" : "HPE245.o1-2526-SP",
-        "SED598.95-2526-SP" : "SED598.9s-2526-SP"
+        #"HPE245.01-2526-SP" : "HPE245.o1-2526-SP",
+        #"SED598.95-2526-SP" : "SED598.9s-2526-SP"
+        "EDU592.G4-2526-AS" : "EDU592.g4-2526-AS"
     }
 
     # course_doubles, a set of key-value pairs, is used to force anyone
@@ -120,6 +123,10 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     #print(blacklist[0][0])
 
     for record in inrecords:
+        # Suppress enrollments in courses that fix_courses rejects
+        if not course_id_ok(record['course_id']):
+            continue
+        
         # Massage record itself
         if record['course_id'] in course_subs.keys():
             record['course_id'] = course_subs[record['course_id']]

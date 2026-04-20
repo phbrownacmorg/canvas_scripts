@@ -72,7 +72,8 @@ def correct_long_name(coursename: str) -> str:
     return ' '.join(wordlist)
 
 def adjust_account(account_id: str, course_id: str) -> str:
-    account_exceptions: dict[str, str] = { 'ATA': 'ATA', 'AST': 'CH', 'PHY': 'CH' }
+    account_exceptions: dict[str, str] = { 'ATA': 'ATA', 'AST': 'CH', 'MTH': 'MA', 'PHY': 'CH' }
+    #course_exceptions: dict[str, str] = { '
     result: str = account_id
     prefix: str = course_id[:3]
     if prefix in account_exceptions:
@@ -113,12 +114,16 @@ def filter_one_course(inrec: dict[str, str]) -> dict[str, str]:
     outrec['blueprint_course_id'] = 'blueprint'
     return outrec
 
+def course_id_ok(course_id: str) -> bool:
+    return course_id[-2:] in goodsuffixes
+
 # Determine whether the course represented by RECORD should be entered
 # in Canvas or not.
 def valid_course(record: dict[str,str]) -> bool:
-    result:bool = (record['term_id'][-2:] in goodsuffixes)
+    return course_id_ok(record['course_id'])
+    #result:bool = (record['term_id'][-2:] in goodsuffixes)
     #(record['term_id'] in goodterms)
-    return result
+    #return result
 
 # Takes a list of course records, each one a dictionary, filters them,
 # and returns the result of that filtering.
