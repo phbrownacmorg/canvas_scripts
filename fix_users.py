@@ -3,6 +3,7 @@
 # Peter Brown <peter.brown@converse.edu>, 2020-07-27
 # Changed from a standalone program to a library, 2020-08-04
 
+import filter_csv # for read_manual_entries
 import re
 
 # Fix initials in the long name.  I am brazenly assuming that we have no
@@ -47,6 +48,10 @@ def valid_for_input(record:dict[str, str]) -> bool:
 # and returns the result of that filtering.
 def filter_users(inrecords:list[dict[str, str]]) -> list[dict[str, str]]:
     outrecords:list[dict[str, str]] = []
+
+# Add the manual users if any
+    inrecords.extend(filter_csv.read_manual_entries('manual_users.csv'))
+    
     for record in inrecords:
         if valid_for_input(record):
             outrecords.append(filter_one_user(record))

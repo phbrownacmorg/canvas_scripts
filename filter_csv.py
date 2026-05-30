@@ -57,6 +57,16 @@ def read_from_csv(infile:Path) -> list[dict[str, str]]:
     # The dictReader guarantees this is true, BTW.
     return records
 
+def read_manual_entries(fname: str) -> list[dict[str, str]]:
+    """If CSV file FILENAME exists in the current directory, read and
+    return the records contained in it."""
+    records: list[dict[str, str]] = []
+    infile = Path(__file__).parent.joinpath(fname)
+    print(infile)
+    if infile.is_file():
+        records = read_from_csv(infile)
+    return records
+
 def read_manual_enrollments() -> list[dict[str, str]]:
     """If manual_enrollments.csv exists in the current directory, read
        and return the enrollment records contained in it."""

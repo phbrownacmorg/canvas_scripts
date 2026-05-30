@@ -2,7 +2,7 @@
 # Filter to add training-course enrollments to enrollments.csv
 # Peter Brown <peter.brown@converse.edu>, 2020-07-31
 
-import filter_csv # for read_manual_enrollments()
+import filter_csv # for read_manual_entries()
 import re
 from fix_courses import course_id_ok
 from typing import cast, Optional
@@ -74,7 +74,8 @@ def ok_to_add(inrecord: dict[str, str], last_outrecord: dict[str, str]) -> bool:
           # ('1580463', 'EDU591.Y3-2526-FA'),
           # ('1580464', 'EDU591.Y3-2526-FA'),
           # ('1580490', 'EDU591.Y3-2526-FA')
-          ('1579778', 'MUH103.01-2526-SP')
+          ('1579778', 'MUH103.01-2526-SP'),
+          ('1582614', 'EDU592.G5-2526-AS')
         ]
 
     ok: bool = not ((inrecord['user_id'], inrecord['course_id']) in blacklist)
@@ -93,7 +94,7 @@ def filter_enrollments(inrecords: list[dict[str, str]]) -> list[dict[str, str]]:
     #print('Filtering enrollments')
 
     # Add the manual enrollments, if any
-    inrecords.extend(filter_csv.read_manual_enrollments())
+    inrecords.extend(filter_csv.read_manual_entries('manual_enrollments.csv'))
 
     outrecords: list[dict[str, str]] = []
     # Track the last record added to the outrecords
