@@ -2,7 +2,7 @@
 
 # Nagios plugin to check on the outbound connection from w4681
 
-. /usr/lib/nagios/plugins/utils.sh
+. /usr/local/nagios/libexec/utils.sh
 
 while getopts "c:w:h" ARG; do
 	case $ARG in

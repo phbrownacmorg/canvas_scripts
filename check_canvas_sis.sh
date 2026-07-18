@@ -2,7 +2,7 @@
 
 # Nagios plugin to check whether the SIS uploads are proceeding correctly
 
-. /usr/lib/nagios/plugins/utils.sh
+. /usr/local/nagios/libexec/utils.sh
 
 # set default values for the thresholds
 #WARN=90
@@ -16,7 +16,7 @@ while getopts "c:w:h" ARG; do
 	esac
 done
 #echo Crit: $CRIT
-STATDIR=/home/phbrown/bin/canvas_scripts
+STATDIR=/home/phbrown@converse.edu/bin/canvas_scripts
 STATFILE=${STATDIR}/converse.instructure.com-upload.txt
 FILE_CONTENTS=`/usr/bin/head --bytes=100 $STATFILE`
 #echo FILE_CONTENTS is "$FILE_CONTENTS"
